@@ -1,8 +1,9 @@
 package ai.aitia.arrowhead.application.common.networking;
 
-import javax.naming.CommunicationException;
+import ai.aitia.arrowhead.application.common.exception.CommunicationException;
+import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
 
-public class HttpsService implements Communication{
+public class HttpsService implements Communication {
 
 	@Override
 	public CommunicationType getType() {
@@ -11,15 +12,20 @@ public class HttpsService implements Communication{
 	
 	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
-		
+		// TODO certificate
 	}
 	
-	public <T> T send(final String address, final int port, final String path, final Class<T> responseType) throws CommunicationException {
-		return send(address, port, path, null, responseType);
+	@Override
+	public boolean isInitialized() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	public <T> T send(final HttpMethod method, final String address, final int port, final String path, final Class<T> responseType) throws CommunicationException {
+		return send(method, address, port, path, null, responseType);
 	}
 
-	public <T, P> T send(final String address, final int port, final String path, P payload, final Class<T> responseType) throws CommunicationException {
+	public <T, P> T send(final HttpMethod method, final String address, final int port, final String path, P payload, final Class<T> responseType) throws CommunicationException {
 		try {
 			// TODO Auto-generated method stub
 			return null;

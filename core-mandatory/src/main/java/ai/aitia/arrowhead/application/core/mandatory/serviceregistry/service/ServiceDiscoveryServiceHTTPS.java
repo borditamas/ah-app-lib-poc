@@ -9,14 +9,16 @@ import ai.aitia.arrowhead.application.common.networking.properties.HttpsKey;
 import ai.aitia.arrowhead.application.common.service.model.OperationModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
+import ai.aitia.arrowhead.application.common.verification.Ensure;
 
 public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 
 	//=================================================================================================
 	// members
 	
+	private final String name = "service-discovery";
+	
 	private final HttpsService https;
-
 	private final String address;
 	private final int port;
 	
@@ -36,7 +38,8 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	
 	//-------------------------------------------------------------------------------------------------
 	public ServiceDiscoveryServiceHTTPS(final HttpsService https, final String address, final int port, final String queryPath, final HttpMethod queryMethod) {
-		//Assert https init
+		Ensure.isTrue(https.isInitialized(), "https is not initialized");
+		
 		this.https = https;
 		this.address = address;
 		this.port = port;
@@ -47,8 +50,7 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public String getServiceName() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.name;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -60,13 +62,18 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public void initialize(final List<OperationModel> operations) {
-		for (final OperationModel operation : operations) {
-			if (operation.getOperation().equalsIgnoreCase(registerOperation)) {
+	public void load(final ServiceModel service) {
+		Ensure.notNull(service, "service is null");
+		Ensure.isTrue(service.getName().equalsIgnoreCase(this.name), "Service name missmatch");
+		Ensure.notEmpty(service.getOperations(), "operation list is empty");
+		
+		for (final OperationModel operation : service.getOperations()) {
+			Ensure.notNull(operation, "operation is null");
+			if (operation.getOperation().equalsIgnoreCase(this.registerOperation)) {
 				this.registerPath = operation.getHttpsProperties().get(HttpsKey.PATH);
 				this.registerMethod = HttpMethod.valueOf(operation.getHttpsProperties().get(HttpsKey.METHOD));
 			}
-			if (operation.getOperation().equalsIgnoreCase(unregisterOperation)) {
+			if (operation.getOperation().equalsIgnoreCase(this.unregisterOperation)) {
 				this.unregisterPath = operation.getHttpsProperties().get(HttpsKey.PATH);
 				this.unregisterMethod = HttpMethod.valueOf(operation.getHttpsProperties().get(HttpsKey.METHOD));
 			}

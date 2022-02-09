@@ -4,14 +4,14 @@ import java.util.List;
 
 public class ServiceModel {
 	
-	private final String serviceName;
+	private final String name;
 	private final List<OperationModel> operations;
 	
-	public ServiceModel(final String serviceName, final List<OperationModel> operations) {
-		this.serviceName = serviceName;
+	public ServiceModel(final String name, final List<OperationModel> operations) {
+		this.name = name;
 		this.operations = operations;
 	}
 
-	public String getServiceName() { return serviceName; }
+	public String getName() { return name; }
 	public List<OperationModel> getOperations() { return operations; }
 }

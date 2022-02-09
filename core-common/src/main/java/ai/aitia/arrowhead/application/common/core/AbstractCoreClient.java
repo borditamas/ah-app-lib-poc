@@ -5,17 +5,25 @@ import ai.aitia.arrowhead.application.common.networking.CommunicationType;
 
 public abstract class AbstractCoreClient implements CoreClient {
 	
+	//=================================================================================================
+	// members
+	
 	protected String address;
 	protected int port;
 	
 	protected final Communication communicationService;
 	protected final CommunicationType communicationType;
 	
+	//=================================================================================================
+	// methods
+	
+	//-------------------------------------------------------------------------------------------------
 	protected AbstractCoreClient(final Communication communicationService) {
 		this.communicationService = communicationService; 
 		this.communicationType = this.communicationService.getType();
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	protected void setNetworkAddress(final String address, final int port) {
 		this.address = address;
 		this.port = port;

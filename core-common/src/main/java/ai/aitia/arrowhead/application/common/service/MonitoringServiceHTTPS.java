@@ -1,42 +1,43 @@
 package ai.aitia.arrowhead.application.common.service;
 
-import java.util.List;
-
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.HttpsService;
+import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
 import ai.aitia.arrowhead.application.common.service.model.OperationModel;
+import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
+import ai.aitia.arrowhead.application.common.verification.Ensure;
 
 public class MonitoringServiceHTTPS implements MonitoringService {
 	
 	//=================================================================================================
 	// members
 	
-	private final HttpsService https;
+	private final String name = "monitoring";
 	
-	private final String address;
-	private final int port;
+	private HttpsService https;	
+	private String address;
+	private int port;
 	
+	private final String echoOperation = "echo";
 	private String echoPath;
+	private HttpMethod echoMethod;
 	
 	//=================================================================================================
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public MonitoringServiceHTTPS(final HttpsService https, final String address, final int port) {
-		//Assert https init
+	public MonitoringServiceHTTPS(final HttpsService https) {
+		Ensure.isTrue(https.isInitialized(), "https is not initialized");
 		this.https = https;
-		this.address = address;
-		this.port = port;
-	}	
+	}
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public String getServiceName() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.name;
 	}
-	
+
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public ServiceQueryModel getServiceQueryForm() {
@@ -46,9 +47,20 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public void initialize(List<OperationModel> operations) {
-		// TODO Auto-generated method stub
+	public void load(final ServiceModel service) {
+		Ensure.notNull(service, "service is null");
+		Ensure.isTrue(service.getName().equalsIgnoreCase(this.name), "Service name missmatch");
+		Ensure.notEmpty(service.getOperations(), "operation list is empty");
 		
+		for (final OperationModel operation : service.getOperations()) {
+			Ensure.notNull(operation, "operation is null");
+			if (operation.getOperation().equalsIgnoreCase(this.echoOperation)) {
+				this.address =  operation.getHttpsProperties().getAddress();
+				this.port =  operation.getHttpsProperties().getPort().intValue();
+				this.echoPath = operation.getHttpsProperties().getPath();
+				this.echoMethod = operation.getHttpsProperties().getMethod();
+			}
+		}		
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -63,11 +75,11 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public boolean echo() throws CommunicationException {
+	public boolean echo() {
 		try {
-			https.send(address, port, echoPath, Void.class);
+			https.send(echoMethod, address, port, echoPath, Void.class);
 			return true;
-		} catch (final Exception ex) {
+		} catch (final CommunicationException ex) {
 			return false;
 		}
 	}

@@ -11,6 +11,7 @@ import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
+import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryService;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryServiceHTTPS;
 
@@ -35,6 +36,12 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 		super.setNetworkAddress(address, port);
 		this.queryPath = queryPath;
 		this.queryMethod = queryMethod;
+		
+		Ensure.notNull(super.communicationService, "communicationService is null.");
+		Ensure.notEmpty(super.address, "address is null.");
+		Ensure.portRange(port);
+		Ensure.notNull(queryPath, "queryPath is null");
+		Ensure.notNull(queryMethod, "queryMethod is null");
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -54,7 +61,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			
 		} catch (final Exception ex) {
 			// TODO: error log
-			throw new InitializationException(ex.getMessage());
+			throw new InitializationException(ex.getMessage(), ex);
 		}
 	}
 
@@ -105,12 +112,8 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			this.monitoringService = createMonitoringServiceHTTPS(https);
 			break;
 
-		case WEBSOCKET:
-			//TODO
-			break;
-
 		default:
-			//TODO throw ex
+			throw new InitializationException("Unsupported communication type: " + super.communicationType.name());
 		}
 	}
 	
@@ -130,14 +133,14 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			throw new InitializationException(serviceDiscovery.getServiceName() + " service was not discovered.");
 		}
 		
-		serviceDiscovery.initialize(services.get(0).getOperations());		
+		serviceDiscovery.load(services.get(0));		
 		serviceDiscovery.verify();
 		return serviceDiscovery;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	private MonitoringService createMonitoringServiceHTTPS(final HttpsService https) {
-		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https, super.address, super.port);
+		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https);
 		
 		List<ServiceModel> services;
 		try {
@@ -150,7 +153,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			throw new InitializationException(monitoring.getServiceName() + " service was not discovered.");
 		}
 		
-		monitoring.initialize(services.get(0).getOperations());
+		monitoring.load(services.get(0));
 		monitoring.verify();
 		return monitoringService;
 	}

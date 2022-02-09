@@ -4,4 +4,5 @@ public interface Communication {
 
 	public CommunicationType getType();
 	public void initialize();
+	public boolean isInitialized();
 }

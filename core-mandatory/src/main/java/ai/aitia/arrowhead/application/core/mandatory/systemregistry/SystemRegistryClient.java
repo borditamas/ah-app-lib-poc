@@ -11,6 +11,7 @@ import ai.aitia.arrowhead.application.common.networking.HttpsService;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
+import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.ServiceRegistryClient;
 
 public class SystemRegistryClient extends AbstractCoreClient {
@@ -30,6 +31,9 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	public SystemRegistryClient(final Communication communicationService, final ServiceRegistryClient srClient) {
 		super(communicationService);
 		this.srClient = srClient;
+		
+		Ensure.notNull(super.communicationService, "communicationService is null.");
+		Ensure.notNull(this.srClient, "srClient is null.");
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -45,11 +49,14 @@ public class SystemRegistryClient extends AbstractCoreClient {
 			this.srClient.verifyInitialization();
 			super.communicationService.initialize();
 			initializeServices();
+			
+			Ensure.notEmpty(super.address, "address is empty");
+			Ensure.portRange(super.port);
 			// TODO: info log
 			
 		} catch (final Exception ex) {
 			// TODO: error log
-			throw new InitializationException(ex.getMessage());
+			throw new InitializationException(ex.getMessage(), ex);
 		}
 	}
 
@@ -92,10 +99,6 @@ public class SystemRegistryClient extends AbstractCoreClient {
 			final HttpsService https = (HttpsService)super.communicationService;
 			this.monitoringService = createMonitoringServiceHTTPS(https);
 			break;
-			
-		case WEBSOCKET:
-			//TODO
-			break;
 
 		default:
 			throw new InitializationException("Unsupported communication type: " + super.communicationType.name());
@@ -104,7 +107,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	private MonitoringService createMonitoringServiceHTTPS(final HttpsService https) {
-		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https, super.address, super.port);
+		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https);
 		
 		List<ServiceModel> services;
 		try {
@@ -120,8 +123,13 @@ public class SystemRegistryClient extends AbstractCoreClient {
 			throw new InitializationException(monitoring.getServiceName() + " service was not discovered.");
 		}
 		
-		monitoring.initialize(services.get(0).getOperations());
+		final ServiceModel serviceModel = services.get(0);
+		monitoring.load(serviceModel);
 		monitoring.verify();
+		
+		super.setNetworkAddress(serviceModel.getOperations().get(0).getHttpsProperties().getAddress(),
+								serviceModel.getOperations().get(0).getHttpsProperties().getPort().intValue());
+		
 		return monitoringService;
 	}
 }
