@@ -47,7 +47,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 		try {
 			super.communicationService.initialize();
 			initializeServices();
-			this.initialized = isAvailable();
+			this.initialized = true;
 			// TODO: info log
 			
 		} catch (final Exception ex) {
@@ -120,7 +120,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 		try {
 			services = serviceDiscoveryService.query(serviceDiscovery.getServiceQueryForm());
 			
-		} catch (CommunicationException ex) {
+		} catch (final CommunicationException ex) {
 			throw new InitializationException("CommunicationException occured while querying " + serviceDiscovery.getServiceName() + " service", ex);
 		}
 
@@ -141,7 +141,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 		List<ServiceModel> services;
 		try {
 			services = serviceDiscoveryService.query(monitoring.getServiceQueryForm());
-		} catch (CommunicationException e) {
+		} catch (final CommunicationException e) {
 			throw new InitializationException("CommunicationException occured while querying " + monitoring.getServiceName() + " service");
 		}
 		

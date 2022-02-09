@@ -18,7 +18,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	//=================================================================================================
 	// members
 	
-	private boolean initialized = false;
+	private final boolean initialized = false;
 	private final ServiceRegistryClient srClient;
 	
 	private MonitoringService monitoringService;
@@ -42,9 +42,9 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	@Override
 	public void initialize() {
 		try {
+			this.srClient.verifyInitialization();
 			super.communicationService.initialize();
 			initializeServices();
-			this.initialized = isAvailable();
 			// TODO: info log
 			
 		} catch (final Exception ex) {
@@ -112,7 +112,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 		} catch (final InitializationException ex) {
 			throw new InitializationException("Service Registry is not initialized.");
 			
-		} catch (CommunicationException ex) {
+		} catch (final CommunicationException ex) {
 			throw new InitializationException("CommunicationException occured while querying " + monitoring.getServiceName() + " service", ex);
 		}
 		
