@@ -16,20 +16,26 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 		this.https = https;
 		this.address = address;
 		this.port = port;
-		this.echoPath = echoPath;
+	}	
+	
+	@Override
+	public String getServiceName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
+	@Override
+	public ServiceQueryModel getServiceQueryForm() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public void verify() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
-	public ServiceQueryModel getServiceQueryForm() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	@Override
 	public boolean echo() {

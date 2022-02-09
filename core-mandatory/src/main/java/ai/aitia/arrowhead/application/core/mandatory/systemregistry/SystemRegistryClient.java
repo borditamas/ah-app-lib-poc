@@ -1,9 +1,9 @@
 package ai.aitia.arrowhead.application.core.mandatory.systemregistry;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
+import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communication;
 import ai.aitia.arrowhead.application.common.networking.CommunicationType;
@@ -105,13 +105,21 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	//-------------------------------------------------------------------------------------------------
 	private MonitoringService createMonitoringServiceHTTPS(final HttpsService https) {
 		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https, super.address, super.port);
-		final List<ServiceModel> services = new ArrayList<ServiceModel>();
+		
+		List<ServiceModel> services;
 		try {
-			services.addAll(srClient.serviceDiscoveryService().query(monitoring.getServiceQueryForm()));
+			services = srClient.serviceDiscoveryService().query(monitoring.getServiceQueryForm());
 		} catch (final InitializationException ex) {
-			// log error
 			throw new InitializationException("Service Registry is not initialized.");
+			
+		} catch (CommunicationException ex) {
+			throw new InitializationException("CommunicationException occured while querying " + monitoring.getServiceName() + " service", ex);
 		}
+		
+		if (services.size() < 1 ) {
+			throw new InitializationException(monitoring.getServiceName() + " service was not discovered.");
+		}
+		
 		//TODO set others
 		monitoring.verify();
 		return monitoringService;

@@ -2,6 +2,7 @@ package ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service;
 
 import java.util.List;
 
+import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.HttpsService;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
@@ -33,8 +34,9 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public void verify() {
-		// TODO Auto-generated method stub		
+	public String getServiceName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -43,27 +45,33 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	//-------------------------------------------------------------------------------------------------
+	@Override
+	public void verify() {
+		// TODO Auto-generated method stub		
+	}
 
 	//=================================================================================================
 	// operations
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public ServiceModel register(final ServiceModel service) {
+	public ServiceModel register(final ServiceModel service) throws CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public boolean unregister(final ServiceModel service) {
+	public boolean unregister(final ServiceModel service) throws CommunicationException {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public List<ServiceModel> query(final ServiceQueryModel form) {
+	public List<ServiceModel> query(final ServiceQueryModel form) throws CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}

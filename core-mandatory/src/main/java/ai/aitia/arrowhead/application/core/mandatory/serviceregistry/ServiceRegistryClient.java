@@ -1,12 +1,16 @@
 package ai.aitia.arrowhead.application.core.mandatory.serviceregistry;
 
+import java.util.List;
+
 import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
+import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communication;
 import ai.aitia.arrowhead.application.common.networking.CommunicationType;
 import ai.aitia.arrowhead.application.common.networking.HttpsService;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
+import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryService;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryServiceHTTPS;
 
@@ -111,15 +115,41 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	//-------------------------------------------------------------------------------------------------
 	private ServiceDiscoveryService createServiceDiscoveryServiceHTTPS(final HttpsService https) {
 		final ServiceDiscoveryServiceHTTPS serviceDiscovery = new ServiceDiscoveryServiceHTTPS(https, super.address, super.port, queryPath);
-		//TODO query for the others
+		
+		List<ServiceModel> services;
+		try {
+			services = serviceDiscoveryService.query(serviceDiscovery.getServiceQueryForm());
+			
+		} catch (CommunicationException ex) {
+			throw new InitializationException("CommunicationException occured while querying " + serviceDiscovery.getServiceName() + " service", ex);
+		}
+
+		if (services.size() < 1 ) {
+			throw new InitializationException(serviceDiscovery.getServiceName() + " service was not discovered.");
+		}
+		
+		//TODO set
+		
 		serviceDiscovery.verify();
 		return serviceDiscovery;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	private MonitoringService createMonitoringServiceHTTPS(final HttpsService https) {
-		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https, super.address, super.port);	
-		//TODO query
+		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https, super.address, super.port);
+		
+		List<ServiceModel> services;
+		try {
+			services = serviceDiscoveryService.query(monitoring.getServiceQueryForm());
+		} catch (CommunicationException e) {
+			throw new InitializationException("CommunicationException occured while querying " + monitoring.getServiceName() + " service");
+		}
+		
+		if (services.size() < 1 ) {
+			throw new InitializationException(monitoring.getServiceName() + " service was not discovered.");
+		}
+		
+		//TODO set
 		monitoring.verify();
 		return monitoringService;
 	}
