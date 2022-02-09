@@ -120,7 +120,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 			throw new InitializationException(monitoring.getServiceName() + " service was not discovered.");
 		}
 		
-		//TODO set others
+		monitoring.initialize(services.get(0).getOperations());
 		monitoring.verify();
 		return monitoringService;
 	}

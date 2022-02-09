@@ -4,6 +4,9 @@ import java.util.List;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.HttpsService;
+import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
+import ai.aitia.arrowhead.application.common.networking.properties.HttpsKey;
+import ai.aitia.arrowhead.application.common.service.model.OperationModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
 
@@ -16,20 +19,29 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 
 	private final String address;
 	private final int port;
-	private final String queryPath;
 	
+	private final String queryPath;
+	private final HttpMethod queryMethod;
+	
+	private final String registerOperation = "register";
 	private String registerPath;
+	private HttpMethod registerMethod;
+	
+	private final String unregisterOperation = "unregister";
 	private String unregisterPath;
+	private HttpMethod unregisterMethod;
 	
 	//=================================================================================================
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceDiscoveryServiceHTTPS(final HttpsService https, final String address, final int port, final String queryPath) {
+	public ServiceDiscoveryServiceHTTPS(final HttpsService https, final String address, final int port, final String queryPath, final HttpMethod queryMethod) {
+		//Assert https init
 		this.https = https;
 		this.address = address;
 		this.port = port;
 		this.queryPath = queryPath;
+		this.queryMethod = queryMethod;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -44,6 +56,22 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	public ServiceQueryModel getServiceQueryForm() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	//-------------------------------------------------------------------------------------------------
+	@Override
+	public void initialize(final List<OperationModel> operations) {
+		for (final OperationModel operation : operations) {
+			if (operation.getOperation().equalsIgnoreCase(registerOperation)) {
+				this.registerPath = operation.getHttpsProperties().get(HttpsKey.PATH);
+				this.registerMethod = HttpMethod.valueOf(operation.getHttpsProperties().get(HttpsKey.METHOD));
+			}
+			if (operation.getOperation().equalsIgnoreCase(unregisterOperation)) {
+				this.unregisterPath = operation.getHttpsProperties().get(HttpsKey.PATH);
+				this.unregisterMethod = HttpMethod.valueOf(operation.getHttpsProperties().get(HttpsKey.METHOD));
+			}
+		}
+		
 	}
 	
 	//-------------------------------------------------------------------------------------------------

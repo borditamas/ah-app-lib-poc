@@ -5,9 +5,9 @@ import java.util.List;
 import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
-import ai.aitia.arrowhead.application.common.networking.Communication;
 import ai.aitia.arrowhead.application.common.networking.CommunicationType;
 import ai.aitia.arrowhead.application.common.networking.HttpsService;
+import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
@@ -21,6 +21,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	
 	private boolean initialized = false;
 	private final String queryPath;
+	private final HttpMethod queryMethod;
 	
 	private ServiceDiscoveryService serviceDiscoveryService;
 	private MonitoringService monitoringService;
@@ -29,10 +30,11 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceRegistryClient(final Communication communicationService, final String address, final int port, final String queryPath) {
-		super(communicationService);
+	public ServiceRegistryClient(final HttpsService https, final String address, final int port, final String queryPath, final HttpMethod queryMethod) {
+		super(https);
 		super.setNetworkAddress(address, port);
 		this.queryPath = queryPath;
+		this.queryMethod = queryMethod;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -114,7 +116,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	private ServiceDiscoveryService createServiceDiscoveryServiceHTTPS(final HttpsService https) {
-		final ServiceDiscoveryServiceHTTPS serviceDiscovery = new ServiceDiscoveryServiceHTTPS(https, super.address, super.port, queryPath);
+		final ServiceDiscoveryServiceHTTPS serviceDiscovery = new ServiceDiscoveryServiceHTTPS(https, super.address, super.port, this.queryPath, this.queryMethod);
 		
 		List<ServiceModel> services;
 		try {
@@ -128,8 +130,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			throw new InitializationException(serviceDiscovery.getServiceName() + " service was not discovered.");
 		}
 		
-		//TODO set
-		
+		serviceDiscovery.initialize(services.get(0).getOperations());		
 		serviceDiscovery.verify();
 		return serviceDiscovery;
 	}
@@ -149,7 +150,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			throw new InitializationException(monitoring.getServiceName() + " service was not discovered.");
 		}
 		
-		//TODO set
+		monitoring.initialize(services.get(0).getOperations());
 		monitoring.verify();
 		return monitoringService;
 	}
