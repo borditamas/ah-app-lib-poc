@@ -1,5 +1,6 @@
 package ai.aitia.arrowhead.application.common.service;
 
+import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.HttpsService;
 import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
 
@@ -38,7 +39,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 
 	
 	@Override
-	public boolean echo() {
+	public boolean echo() throws CommunicationException {
 		try {
 			https.send(address, port, echoPath, Void.class);
 			return true;

@@ -1,5 +1,6 @@
 package ai.aitia.arrowhead.application.common.core;
 
+import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.CommunicationType;
 
 public interface CoreClient {
@@ -8,5 +9,5 @@ public interface CoreClient {
 	void initialize();
 	boolean isInitialized();
 	void verifyInitialization();
-	boolean isAvailable();
+	boolean isAvailable() throws CommunicationException;
 }

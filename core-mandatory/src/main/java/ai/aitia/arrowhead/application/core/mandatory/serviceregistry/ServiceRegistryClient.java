@@ -72,7 +72,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public boolean isAvailable() {
+	public boolean isAvailable() throws CommunicationException {
 		return this.monitoringService().echo();
 	}
 	
@@ -124,7 +124,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			throw new InitializationException("CommunicationException occured while querying " + serviceDiscovery.getServiceName() + " service", ex);
 		}
 
-		if (services.size() < 1 ) {
+		if (services.size() < 1) {
 			throw new InitializationException(serviceDiscovery.getServiceName() + " service was not discovered.");
 		}
 		
@@ -145,7 +145,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			throw new InitializationException("CommunicationException occured while querying " + monitoring.getServiceName() + " service");
 		}
 		
-		if (services.size() < 1 ) {
+		if (services.size() < 1) {
 			throw new InitializationException(monitoring.getServiceName() + " service was not discovered.");
 		}
 		
