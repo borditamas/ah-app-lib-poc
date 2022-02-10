@@ -5,9 +5,9 @@ import java.util.List;
 import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
-import ai.aitia.arrowhead.application.common.networking.Communication;
-import ai.aitia.arrowhead.application.common.networking.CommunicationType;
-import ai.aitia.arrowhead.application.common.networking.HttpsService;
+import ai.aitia.arrowhead.application.common.networking.Communicator;
+import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
+import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
@@ -28,18 +28,18 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public SystemRegistryClient(final Communication communicationService, final ServiceRegistryClient srClient) {
-		super(communicationService);
+	public SystemRegistryClient(final Communicator communicator, final ServiceRegistryClient srClient) {
+		super(communicator);
 		this.srClient = srClient;
 		
-		Ensure.notNull(super.communicationService, "communicationService is null.");
+		Ensure.notNull(super.communicator, "communicator is null.");
 		Ensure.notNull(this.srClient, "srClient is null.");
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public CommunicationType getCommunicationType() {
-		return super.communicationType;
+	public CommunicatorType getCommunicatorType() {
+		return super.communicatorType;
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	public void initialize() {
 		try {
 			this.srClient.verifyInitialization();
-			super.communicationService.initialize();
+			super.communicator.initialize();
 			initializeServices();
 			
 			Ensure.notEmpty(super.address, "address is empty");
@@ -76,7 +76,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public boolean isAvailable() throws CommunicationException {
+	public boolean isAvailable() {
 		return monitoringService().echo();
 	}
 	
@@ -94,19 +94,19 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	private void initializeServices() {
-		switch (super.communicationType) {
+		switch (super.communicatorType) {
 		case HTTPS:
-			final HttpsService https = (HttpsService)super.communicationService;
+			final HttpsCommunicator https = (HttpsCommunicator)super.communicator;
 			this.monitoringService = createMonitoringServiceHTTPS(https);
 			break;
 
 		default:
-			throw new InitializationException("Unsupported communication type: " + super.communicationType.name());
+			throw new InitializationException("Unsupported communicator type: " + super.communicatorType.name());
 		}
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private MonitoringService createMonitoringServiceHTTPS(final HttpsService https) {
+	private MonitoringService createMonitoringServiceHTTPS(final HttpsCommunicator https) {
 		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https);
 		
 		List<ServiceModel> services;

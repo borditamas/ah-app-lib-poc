@@ -1,11 +1,11 @@
 package ai.aitia.arrowhead.application.common.core;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
-import ai.aitia.arrowhead.application.common.networking.CommunicationType;
+import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 
 public interface CoreClient {
 	
-	CommunicationType getCommunicationType();
+	CommunicatorType getCommunicatorType();
 	void initialize();
 	boolean isInitialized();
 	void verifyInitialization();

@@ -3,11 +3,11 @@ package ai.aitia.arrowhead.application.common.networking;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
 
-public class HttpsService implements Communication {
+public class HttpsCommunicator implements Communicator {
 
 	@Override
-	public CommunicationType getType() {
-		return CommunicationType.HTTPS;
+	public CommunicatorType getType() {
+		return CommunicatorType.HTTPS;
 	}
 	
 	@Override

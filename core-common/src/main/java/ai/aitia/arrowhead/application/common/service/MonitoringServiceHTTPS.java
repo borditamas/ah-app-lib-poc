@@ -1,7 +1,7 @@
 package ai.aitia.arrowhead.application.common.service;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
-import ai.aitia.arrowhead.application.common.networking.HttpsService;
+import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
 import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
 import ai.aitia.arrowhead.application.common.service.model.OperationModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
@@ -15,7 +15,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	
 	private final String name = "monitoring";
 	
-	private HttpsService https;	
+	private HttpsCommunicator https;	
 	private String address;
 	private int port;
 	
@@ -27,7 +27,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public MonitoringServiceHTTPS(final HttpsService https) {
+	public MonitoringServiceHTTPS(final HttpsCommunicator https) {
 		Ensure.isTrue(https.isInitialized(), "https is not initialized");
 		this.https = https;
 	}

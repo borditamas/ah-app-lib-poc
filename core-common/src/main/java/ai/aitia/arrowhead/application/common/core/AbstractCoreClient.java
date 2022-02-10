@@ -1,7 +1,7 @@
 package ai.aitia.arrowhead.application.common.core;
 
-import ai.aitia.arrowhead.application.common.networking.Communication;
-import ai.aitia.arrowhead.application.common.networking.CommunicationType;
+import ai.aitia.arrowhead.application.common.networking.Communicator;
+import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 
 public abstract class AbstractCoreClient implements CoreClient {
 	
@@ -11,16 +11,16 @@ public abstract class AbstractCoreClient implements CoreClient {
 	protected String address;
 	protected int port;
 	
-	protected final Communication communicationService;
-	protected final CommunicationType communicationType;
+	protected final Communicator communicator;
+	protected final CommunicatorType communicatorType;
 	
 	//=================================================================================================
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	protected AbstractCoreClient(final Communication communicationService) {
-		this.communicationService = communicationService; 
-		this.communicationType = this.communicationService.getType();
+	protected AbstractCoreClient(final Communicator communicatior) {
+		this.communicator = communicatior; 
+		this.communicatorType = this.communicator.getType();
 	}
 
 	//-------------------------------------------------------------------------------------------------

@@ -1,10 +1,10 @@
 package ai.aitia.arrowhead.application.common.networking;
 
-public class WebsocketService implements Communication {
+public class WebsocketCommunicator implements Communicator {
 
 	@Override
-	public CommunicationType getType() {
-		return CommunicationType.WEBSOCKET;
+	public CommunicatorType getType() {
+		return CommunicatorType.WEBSOCKET;
 	}
 
 	@Override

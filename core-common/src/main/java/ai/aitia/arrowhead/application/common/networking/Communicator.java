@@ -1,8 +1,8 @@
 package ai.aitia.arrowhead.application.common.networking;
 
-public interface Communication {
+public interface Communicator {
 
-	public CommunicationType getType();
+	public CommunicatorType getType();
 	public void initialize();
 	public boolean isInitialized();
 }

@@ -1,6 +1,6 @@
 package ai.aitia.arrowhead.application.common.networking;
 
-public enum CommunicationType {
+public enum CommunicatorType {
 
 	HTTPS, WEBSOCKET;
 }

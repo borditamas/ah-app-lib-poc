@@ -3,7 +3,7 @@ package ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service;
 import java.util.List;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
-import ai.aitia.arrowhead.application.common.networking.HttpsService;
+import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
 import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
 import ai.aitia.arrowhead.application.common.networking.properties.HttpsKey;
 import ai.aitia.arrowhead.application.common.service.model.OperationModel;
@@ -18,7 +18,7 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	
 	private final String name = "service-discovery";
 	
-	private final HttpsService https;
+	private final HttpsCommunicator https;
 	private final String address;
 	private final int port;
 	
@@ -37,7 +37,7 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceDiscoveryServiceHTTPS(final HttpsService https, final String address, final int port, final String queryPath, final HttpMethod queryMethod) {
+	public ServiceDiscoveryServiceHTTPS(final HttpsCommunicator https, final String address, final int port, final String queryPath, final HttpMethod queryMethod) {
 		Ensure.isTrue(https.isInitialized(), "https is not initialized");
 		
 		this.https = https;

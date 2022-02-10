@@ -5,20 +5,32 @@ import ai.aitia.arrowhead.application.common.networking.properties.WebsocketProp
 
 public class OperationModel {
 
+	//=================================================================================================
+	// members
+	
 	private final String operation;
 	private final HttpsProperties httpsProperties = new HttpsProperties();
 	private final WebsocketProperties websocketProperties = new WebsocketProperties();
 	
+	//-------------------------------------------------------------------------------------------------
 	public OperationModel(final String operation, final HttpsProperties httpsProperties) {
 		this.operation = operation;
 		this.httpsProperties.putAll(httpsProperties);
 	}
 	
+	//-------------------------------------------------------------------------------------------------
 	public OperationModel(final String operation, final WebsocketProperties websocketProperties) {
 		this.operation = operation;
 		this.websocketProperties.putAll(websocketProperties);
 	}
 
+	public OperationModel(final String operation, final HttpsProperties httpsProperties, final WebsocketProperties websocketProperties) {
+		this.operation = operation;
+		this.httpsProperties.putAll(httpsProperties);
+		this.websocketProperties.putAll(websocketProperties);
+	}
+
+	//-------------------------------------------------------------------------------------------------
 	public String getOperation() { return operation; }
 	public HttpsProperties getHttpsProperties() { return httpsProperties; }
 	public WebsocketProperties getWebsocketProperties() { return websocketProperties; }

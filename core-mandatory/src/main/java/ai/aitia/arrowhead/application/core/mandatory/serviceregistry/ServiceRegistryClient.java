@@ -5,8 +5,8 @@ import java.util.List;
 import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
-import ai.aitia.arrowhead.application.common.networking.CommunicationType;
-import ai.aitia.arrowhead.application.common.networking.HttpsService;
+import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
+import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
 import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
@@ -31,13 +31,13 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceRegistryClient(final HttpsService https, final String address, final int port, final String queryPath, final HttpMethod queryMethod) {
+	public ServiceRegistryClient(final HttpsCommunicator https, final String address, final int port, final String queryPath, final HttpMethod queryMethod) {
 		super(https);
 		super.setNetworkAddress(address, port);
 		this.queryPath = queryPath;
 		this.queryMethod = queryMethod;
 		
-		Ensure.notNull(super.communicationService, "communicationService is null.");
+		Ensure.notNull(super.communicator, "communicator is null.");
 		Ensure.notEmpty(super.address, "address is null.");
 		Ensure.portRange(port);
 		Ensure.notNull(queryPath, "queryPath is null");
@@ -46,15 +46,15 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public CommunicationType getCommunicationType() {
-		return super.communicationType;
+	public CommunicatorType getCommunicatorType() {
+		return super.communicatorType;
 	}
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void initialize() {
 		try {
-			super.communicationService.initialize();
+			super.communicator.initialize();
 			initializeServices();
 			this.initialized = true;
 			// TODO: info log
@@ -81,7 +81,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public boolean isAvailable() throws CommunicationException {
+	public boolean isAvailable() {
 		return this.monitoringService().echo();
 	}
 	
@@ -105,20 +105,20 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	private void initializeServices() {
-		switch (super.communicationType) {
+		switch (super.communicatorType) {
 		case HTTPS:
-			final HttpsService https = (HttpsService)super.communicationService;
+			final HttpsCommunicator https = (HttpsCommunicator)super.communicator;
 			this.serviceDiscoveryService = createServiceDiscoveryServiceHTTPS(https);
 			this.monitoringService = createMonitoringServiceHTTPS(https);
 			break;
 
 		default:
-			throw new InitializationException("Unsupported communication type: " + super.communicationType.name());
+			throw new InitializationException("Unsupported communicator type: " + super.communicatorType.name());
 		}
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private ServiceDiscoveryService createServiceDiscoveryServiceHTTPS(final HttpsService https) {
+	private ServiceDiscoveryService createServiceDiscoveryServiceHTTPS(final HttpsCommunicator https) {
 		final ServiceDiscoveryServiceHTTPS serviceDiscovery = new ServiceDiscoveryServiceHTTPS(https, super.address, super.port, this.queryPath, this.queryMethod);
 		
 		List<ServiceModel> services;
@@ -139,7 +139,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private MonitoringService createMonitoringServiceHTTPS(final HttpsService https) {
+	private MonitoringService createMonitoringServiceHTTPS(final HttpsCommunicator https) {
 		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https);
 		
 		List<ServiceModel> services;
