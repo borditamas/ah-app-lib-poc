@@ -2,7 +2,10 @@ package ai.aitia.arrowhead.application.common.service;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
-import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
+import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
+import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
 import ai.aitia.arrowhead.application.common.service.model.OperationModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
@@ -54,11 +57,14 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 		
 		for (final OperationModel operation : service.getOperations()) {
 			Ensure.notNull(operation, "operation is null");
+			Ensure.isTrue(operation.getInterfaceProfiles().containsKey(Protocol.HTTP), "operation have not HTTP profile");
+			
+			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.HTTP);
 			if (operation.getOperation().equalsIgnoreCase(this.echoOperation)) {
-				this.address =  operation.getHttpsProperties().getAddress();
-				this.port =  operation.getHttpsProperties().getPort().intValue();
-				this.echoPath = operation.getHttpsProperties().getPath();
-				this.echoMethod = operation.getHttpsProperties().getMethod();
+				this.address =  interfaceProfile.getAddress();
+				this.port =  interfaceProfile.getPort();
+				this.echoPath = interfaceProfile.get(String.class, HttpsKey.PATH);
+				this.echoMethod = interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD);
 			}
 		}		
 	}

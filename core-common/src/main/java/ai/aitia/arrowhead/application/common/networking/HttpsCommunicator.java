@@ -1,7 +1,7 @@
 package ai.aitia.arrowhead.application.common.networking;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
-import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
 
 public class HttpsCommunicator implements Communicator {
 

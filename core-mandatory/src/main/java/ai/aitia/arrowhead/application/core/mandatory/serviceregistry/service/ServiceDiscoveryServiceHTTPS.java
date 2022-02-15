@@ -4,8 +4,10 @@ import java.util.List;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
-import ai.aitia.arrowhead.application.common.networking.properties.HttpMethod;
-import ai.aitia.arrowhead.application.common.networking.properties.HttpsKey;
+import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
+import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
 import ai.aitia.arrowhead.application.common.service.model.OperationModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
@@ -69,13 +71,16 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		
 		for (final OperationModel operation : service.getOperations()) {
 			Ensure.notNull(operation, "operation is null");
+			Ensure.isTrue(operation.getInterfaceProfiles().containsKey(Protocol.HTTP), "operation have not HTTP profile");
+			
+			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.HTTP);
 			if (operation.getOperation().equalsIgnoreCase(this.registerOperation)) {
-				this.registerPath = operation.getHttpsProperties().get(HttpsKey.PATH);
-				this.registerMethod = HttpMethod.valueOf(operation.getHttpsProperties().get(HttpsKey.METHOD));
+				this.registerPath = interfaceProfile.get(String.class, HttpsKey.PATH);
+				this.registerMethod = interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD);
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.unregisterOperation)) {
-				this.unregisterPath = operation.getHttpsProperties().get(HttpsKey.PATH);
-				this.unregisterMethod = HttpMethod.valueOf(operation.getHttpsProperties().get(HttpsKey.METHOD));
+				this.unregisterPath = interfaceProfile.get(String.class, HttpsKey.PATH);
+				this.unregisterMethod = interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD);
 			}
 		}
 		

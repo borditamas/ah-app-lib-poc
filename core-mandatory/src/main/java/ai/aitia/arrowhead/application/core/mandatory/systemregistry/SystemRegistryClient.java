@@ -8,6 +8,7 @@ import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
+import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
@@ -127,8 +128,8 @@ public class SystemRegistryClient extends AbstractCoreClient {
 		monitoring.load(serviceModel);
 		monitoring.verify();
 		
-		super.setNetworkAddress(serviceModel.getOperations().get(0).getHttpsProperties().getAddress(),
-								serviceModel.getOperations().get(0).getHttpsProperties().getPort().intValue());
+		super.setNetworkAddress(serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.HTTP).getAddress(),
+								serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.HTTP).getPort());
 		
 		return monitoringService;
 	}
