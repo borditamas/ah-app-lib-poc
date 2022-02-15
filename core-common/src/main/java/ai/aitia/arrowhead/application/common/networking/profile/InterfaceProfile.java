@@ -6,30 +6,40 @@ import ai.aitia.arrowhead.application.common.verification.Ensure;
 
 public class InterfaceProfile {
 
+	//=================================================================================================
+	// members
+	
 	private final Protocol protocol;
 	private final String address;
 	private final int port;
 	private final HashMap<String,Object> properties = new HashMap<String,Object>();
 	
+	//=================================================================================================
+	// methods
 	
+	//-------------------------------------------------------------------------------------------------
 	public InterfaceProfile(final Protocol protocol, final String address, final int port) {
 		this.protocol = protocol;
 		this.address = address;
 		this.port = port;
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	public Protocol getProtocol() { return protocol; }
 	public String getAddress() { return address; }
 	public int getPort() { return port; }
 	
+	//-------------------------------------------------------------------------------------------------
 	public void put(final ProtocolKey key, final Object value) {
 		this.properties.put(key.name(), value);
 	}
 	
+	//-------------------------------------------------------------------------------------------------
 	public boolean contains(final ProtocolKey key) {
 		return this.properties.containsKey(key.name());
 	}
 	
+	//-------------------------------------------------------------------------------------------------
 	@SuppressWarnings("unchecked")
 	public <T> T get(final Class<T> castTo, final ProtocolKey key) {
 		final Object o = this.properties.get(key.name());

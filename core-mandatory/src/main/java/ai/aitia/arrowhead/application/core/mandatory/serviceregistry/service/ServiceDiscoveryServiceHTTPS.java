@@ -28,12 +28,10 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	private final HttpMethod queryMethod;
 	
 	private final String registerOperation = "register";
-	private String registerPath;
-	private HttpMethod registerMethod;
+	private InterfaceProfile registerInterfaceProfile;
 	
 	private final String unregisterOperation = "unregister";
-	private String unregisterPath;
-	private HttpMethod unregisterMethod;
+	private InterfaceProfile unregisterInterfaceProfile;
 	
 	//=================================================================================================
 	// methods
@@ -75,12 +73,14 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.HTTP);
 			if (operation.getOperation().equalsIgnoreCase(this.registerOperation)) {
-				this.registerPath = interfaceProfile.get(String.class, HttpsKey.PATH);
-				this.registerMethod = interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD);
+				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for register operation");
+				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for register operation");
+				this.registerInterfaceProfile = interfaceProfile;
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.unregisterOperation)) {
-				this.unregisterPath = interfaceProfile.get(String.class, HttpsKey.PATH);
-				this.unregisterMethod = interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD);
+				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for unregister operation");
+				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for unregister operation");
+				this.unregisterInterfaceProfile = interfaceProfile;
 			}
 		}
 		

@@ -4,7 +4,6 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
-import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
 import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
 import ai.aitia.arrowhead.application.common.service.model.OperationModel;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
@@ -19,12 +18,9 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	private final String name = "monitoring";
 	
 	private HttpsCommunicator https;	
-	private String address;
-	private int port;
 	
 	private final String echoOperation = "echo";
-	private String echoPath;
-	private HttpMethod echoMethod;
+	private InterfaceProfile echoInterfaceProfile;
 	
 	//=================================================================================================
 	// methods
@@ -61,10 +57,14 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.HTTP);
 			if (operation.getOperation().equalsIgnoreCase(this.echoOperation)) {
-				this.address =  interfaceProfile.getAddress();
-				this.port =  interfaceProfile.getPort();
-				this.echoPath = interfaceProfile.get(String.class, HttpsKey.PATH);
-				this.echoMethod = interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD);
+				Ensure.notEmpty(interfaceProfile.getAddress(), "echo operation address is empty");
+				Ensure.portRange(interfaceProfile.getPort());
+				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for echo operation");
+				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for echo operation");
+				
+//				this.echoPath = interfaceProfile.get(String.class, HttpsKey.PATH);
+//				this.echoMethod = interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD);
+				this.echoInterfaceProfile = interfaceProfile;
 			}
 		}		
 	}
@@ -83,7 +83,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	@Override
 	public boolean echo() {
 		try {
-			https.send(echoMethod, address, port, echoPath, Void.class);
+			https.send(this.echoInterfaceProfile, Void.class);
 			return true;
 		} catch (final CommunicationException ex) {
 			return false;

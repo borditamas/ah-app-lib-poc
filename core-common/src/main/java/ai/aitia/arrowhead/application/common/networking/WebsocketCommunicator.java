@@ -1,5 +1,8 @@
 package ai.aitia.arrowhead.application.common.networking;
 
+import ai.aitia.arrowhead.application.common.exception.CommunicationException;
+import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
+
 public class WebsocketCommunicator implements Communicator {
 
 	@Override
@@ -19,4 +22,14 @@ public class WebsocketCommunicator implements Communicator {
 		return false;
 	}
 
+	@Override
+	public <T> T send(final InterfaceProfile interfaceProfile, final Class<T> responseType) throws CommunicationException {
+		return send(interfaceProfile, responseType, null);
+	}
+
+	@Override
+	public <T, P> T send(final InterfaceProfile interfaceProfile, final Class<T> responseType, final P payload) throws CommunicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

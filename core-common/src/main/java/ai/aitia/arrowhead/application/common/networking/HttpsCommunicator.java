@@ -1,7 +1,7 @@
 package ai.aitia.arrowhead.application.common.networking;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
-import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
+import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 
 public class HttpsCommunicator implements Communicator {
 
@@ -21,11 +21,13 @@ public class HttpsCommunicator implements Communicator {
 		return false;
 	}
 	
-	public <T> T send(final HttpMethod method, final String address, final int port, final String path, final Class<T> responseType) throws CommunicationException {
-		return send(method, address, port, path, null, responseType);
+	@Override
+	public <T> T send(final InterfaceProfile interfaceProfile, final Class<T> responseType) throws CommunicationException {
+		return send(interfaceProfile, responseType, null);
 	}
 
-	public <T, P> T send(final HttpMethod method, final String address, final int port, final String path, P payload, final Class<T> responseType) throws CommunicationException {
+	@Override
+	public <T,P> T send(final InterfaceProfile interfaceProfile, final Class<T> responseType, final P payload) throws CommunicationException {
 		try {
 			// TODO Auto-generated method stub
 			return null;
