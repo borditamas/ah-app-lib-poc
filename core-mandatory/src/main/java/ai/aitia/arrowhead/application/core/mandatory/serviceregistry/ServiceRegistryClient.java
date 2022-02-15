@@ -5,9 +5,10 @@ import java.util.List;
 import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
+import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
-import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
+import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
+import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
@@ -21,8 +22,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	// members
 	
 	private boolean initialized = false;
-	private final String queryPath;
-	private final HttpMethod queryMethod;
+	private final InterfaceProfile queryInterfaceProfile;
 	
 	private ServiceDiscoveryService serviceDiscoveryService;
 	private MonitoringService monitoringService;
@@ -31,17 +31,12 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceRegistryClient(final HttpsCommunicator https, final String address, final int port, final String queryPath, final HttpMethod queryMethod) {
-		super(https);
-		super.setNetworkAddress(address, port);
-		this.queryPath = queryPath;
-		this.queryMethod = queryMethod;
+	public ServiceRegistryClient(final Communicator communicator, final InterfaceProfile queryInterfaceProfile) {
+		super(communicator);
+		this.queryInterfaceProfile = queryInterfaceProfile;
 		
 		Ensure.notNull(super.communicator, "communicator is null.");
-		Ensure.notEmpty(super.address, "address is null.");
-		Ensure.portRange(port);
-		Ensure.notNull(queryPath, "queryPath is null");
-		Ensure.notNull(queryMethod, "queryMethod is null");
+		Ensure.notNull(this.queryInterfaceProfile, "queryInterfaceProfile is null.");
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -107,9 +102,8 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	private void initializeServices() {
 		switch (super.communicatorType) {
 		case HTTPS:
-			final HttpsCommunicator https = (HttpsCommunicator)super.communicator;
-			this.serviceDiscoveryService = createServiceDiscoveryServiceHTTPS(https);
-			this.monitoringService = createMonitoringServiceHTTPS(https);
+			this.serviceDiscoveryService = createServiceDiscoveryService(new ServiceDiscoveryServiceHTTPS(super.communicator, this.queryInterfaceProfile));
+			this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(super.communicator));
 			break;
 
 		default:
@@ -118,9 +112,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private ServiceDiscoveryService createServiceDiscoveryServiceHTTPS(final HttpsCommunicator https) {
-		final ServiceDiscoveryServiceHTTPS serviceDiscovery = new ServiceDiscoveryServiceHTTPS(https, super.address, super.port, this.queryPath, this.queryMethod);
-		
+	private ServiceDiscoveryService createServiceDiscoveryService(final ServiceDiscoveryServiceHTTPS serviceDiscovery) {
 		List<ServiceModel> services;
 		try {
 			services = serviceDiscoveryService.query(serviceDiscovery.getServiceQueryForm());
@@ -133,15 +125,19 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			throw new InitializationException(serviceDiscovery.getServiceName() + " service was not discovered.");
 		}
 		
-		serviceDiscovery.load(services.get(0));		
+		final ServiceModel serviceModel = services.get(0);
+		serviceDiscovery.load(serviceModel);		
 		serviceDiscovery.verify();
+		
+		//We use this init to set the network address of the system
+		super.setNetworkAddress(serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getAddress(),
+								serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getPort());
+		
 		return serviceDiscovery;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private MonitoringService createMonitoringServiceHTTPS(final HttpsCommunicator https) {
-		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https);
-		
+	private MonitoringService createMonitoringService(final MonitoringServiceHTTPS monitoring) {
 		List<ServiceModel> services;
 		try {
 			services = serviceDiscoveryService.query(monitoring.getServiceQueryForm());
@@ -154,7 +150,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 		}
 		
 		monitoring.load(services.get(0));
-		monitoring.verify();
-		return monitoringService;
+		monitoring.verify();		
+		return monitoring;
 	}
 }

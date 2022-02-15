@@ -7,7 +7,6 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
@@ -97,8 +96,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	private void initializeServices() {
 		switch (super.communicatorType) {
 		case HTTPS:
-			final HttpsCommunicator https = (HttpsCommunicator)super.communicator;
-			this.monitoringService = createMonitoringServiceHTTPS(https);
+			this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(this.communicator));
 			break;
 
 		default:
@@ -107,9 +105,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private MonitoringService createMonitoringServiceHTTPS(final HttpsCommunicator https) {
-		final MonitoringServiceHTTPS monitoring = new MonitoringServiceHTTPS(https);
-		
+	private MonitoringService createMonitoringService(final MonitoringService monitoring) {		
 		List<ServiceModel> services;
 		try {
 			services = srClient.serviceDiscoveryService().query(monitoring.getServiceQueryForm());
@@ -128,9 +124,10 @@ public class SystemRegistryClient extends AbstractCoreClient {
 		monitoring.load(serviceModel);
 		monitoring.verify();
 		
-		super.setNetworkAddress(serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.HTTP).getAddress(),
-								serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.HTTP).getPort());
+		//We use this init to set the network address of the system
+		super.setNetworkAddress(serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getAddress(),
+								serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getPort());
 		
-		return monitoringService;
+		return monitoring;
 	}
 }

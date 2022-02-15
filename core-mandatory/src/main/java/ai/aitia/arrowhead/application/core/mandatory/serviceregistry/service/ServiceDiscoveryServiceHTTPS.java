@@ -3,7 +3,8 @@ package ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service;
 import java.util.List;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
-import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
+import ai.aitia.arrowhead.application.common.networking.Communicator;
+import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
@@ -20,12 +21,10 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	
 	private final String name = "service-discovery";
 	
-	private final HttpsCommunicator https;
-	private final String address;
-	private final int port;
+	private final Communicator https;
 	
-	private final String queryPath;
-	private final HttpMethod queryMethod;
+	private final String queryOperation = "query";
+	private final InterfaceProfile queryInterfaceProfile;
 	
 	private final String registerOperation = "register";
 	private InterfaceProfile registerInterfaceProfile;
@@ -37,14 +36,19 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceDiscoveryServiceHTTPS(final HttpsCommunicator https, final String address, final int port, final String queryPath, final HttpMethod queryMethod) {
+	public ServiceDiscoveryServiceHTTPS(final Communicator https, final InterfaceProfile queryInterfaceProfile) {
+		Ensure.notNull(https, "Communicator is null");
+		Ensure.isTrue(https.getType() == CommunicatorType.HTTPS, "Communicator is not for HTTPS");
 		Ensure.isTrue(https.isInitialized(), "https is not initialized");
 		
+		Ensure.isTrue(queryInterfaceProfile.getProtocol() == Protocol.HTTP, "queryInterfaceProfile is not for HTTPS");
+		Ensure.notEmpty(queryInterfaceProfile.getAddress(), "address is empty");
+		Ensure.portRange(queryInterfaceProfile.getPort());
+		Ensure.notEmpty(queryInterfaceProfile.get(String.class, HttpsKey.PATH), "queryPath is empty");
+		Ensure.notNull(queryInterfaceProfile.get(HttpMethod.class, HttpsKey.METHOD), "queryMethod is null");
+		
 		this.https = https;
-		this.address = address;
-		this.port = port;
-		this.queryPath = queryPath;
-		this.queryMethod = queryMethod;
+		this.queryInterfaceProfile = queryInterfaceProfile;
 	}
 	
 	//-------------------------------------------------------------------------------------------------

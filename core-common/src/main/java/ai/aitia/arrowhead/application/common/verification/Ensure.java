@@ -17,6 +17,13 @@ public class Ensure {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
+	public static void notEmpty(final byte[] bytes, final String msg) {
+		if (bytes.length == 0) {
+			throw new DeveloperException(msg);
+		}
+	}
+	
+	//-------------------------------------------------------------------------------------------------
 	public static void notEmpty(final String str, final String msg) {
 		if (str == null || str.isBlank()) {
 			throw new DeveloperException(msg);

@@ -1,7 +1,8 @@
 package ai.aitia.arrowhead.application.common.service;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
-import ai.aitia.arrowhead.application.common.networking.HttpsCommunicator;
+import ai.aitia.arrowhead.application.common.networking.Communicator;
+import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
@@ -17,7 +18,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	
 	private final String name = "monitoring";
 	
-	private HttpsCommunicator https;	
+	private Communicator https;	
 	
 	private final String echoOperation = "echo";
 	private InterfaceProfile echoInterfaceProfile;
@@ -26,7 +27,9 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public MonitoringServiceHTTPS(final HttpsCommunicator https) {
+	public MonitoringServiceHTTPS(final Communicator https) {
+		Ensure.notNull(https, "Communicator is null");
+		Ensure.isTrue(https.getType() == CommunicatorType.HTTPS, "Communicator is not for HTTPS");
 		Ensure.isTrue(https.isInitialized(), "https is not initialized");
 		this.https = https;
 	}
@@ -61,9 +64,6 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 				Ensure.portRange(interfaceProfile.getPort());
 				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for echo operation");
 				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for echo operation");
-				
-//				this.echoPath = interfaceProfile.get(String.class, HttpsKey.PATH);
-//				this.echoMethod = interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD);
 				this.echoInterfaceProfile = interfaceProfile;
 			}
 		}		
