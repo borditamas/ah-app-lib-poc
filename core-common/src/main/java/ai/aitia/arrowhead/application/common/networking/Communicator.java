@@ -6,7 +6,7 @@ import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile
 public interface Communicator {
 
 	public CommunicatorType getType();
-	public void loadSSLProperties(final SSLProperties sslProps);
+	public void loadSSLProperties(final CommunicationProperties sslProps);
 	public void initialize();
 	public boolean isInitialized();
 	public <T> T send(final InterfaceProfile interfaceProfile, final Class<T> responseType) throws CommunicationException;
