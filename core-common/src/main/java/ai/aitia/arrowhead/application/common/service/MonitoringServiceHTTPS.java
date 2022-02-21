@@ -19,10 +19,10 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	
 	private final String name = "monitoring";
 	
-	private CommunicationClient httpsClient;	
+	private Communicator<CommunicationClient> communicator;	
 	
 	private final String echoOperation = "echo";
-	private InterfaceProfile echoInterfaceProfile;
+	private CommunicationClient echoHttpsClient;
 	
 	//=================================================================================================
 	// methods
@@ -32,7 +32,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 		Ensure.notNull(communicator, "Communicator is null");
 		Ensure.isTrue(communicator.type() == CommunicatorType.HTTPS, "Communicator is not for HTTPS");
 		Ensure.isTrue(communicator.isInitialized(), "https is not initialized");
-		this.httpsClient = communicator.client();
+		this.communicator = communicator;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 				Ensure.portRange(interfaceProfile.getPort());
 				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for echo operation");
 				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for echo operation");
-				this.echoInterfaceProfile = interfaceProfile;
+				this.echoHttpsClient = communicator.client(interfaceProfile);
 			}
 		}		
 	}
@@ -84,7 +84,8 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	@Override
 	public boolean echo() {
 		try {
-			httpsClient.send(this.echoInterfaceProfile, Void.class, null);
+			echoHttpsClient.send(null);
+			echoHttpsClient.receive(Object.class); // Late it will contain some data
 			return true;
 		} catch (final CommunicationException ex) {
 			return false;

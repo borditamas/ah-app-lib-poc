@@ -22,16 +22,16 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	
 	private final String name = "service-discovery";
 	
-	private final CommunicationClient httpsClient;
+	private final Communicator<CommunicationClient> communicator;
 	
 	private final String queryOperation = "query";
-	private final InterfaceProfile queryInterfaceProfile;
+	private final CommunicationClient queryHttpsClient;
 	
 	private final String registerOperation = "register";
-	private InterfaceProfile registerInterfaceProfile;
+	private CommunicationClient registerHttpsClient;
 	
 	private final String unregisterOperation = "unregister";
-	private InterfaceProfile unregisterInterfaceProfile;
+	private CommunicationClient unregisterHttpsClient;
 	
 	//=================================================================================================
 	// methods
@@ -48,8 +48,8 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		Ensure.notEmpty(queryInterfaceProfile.get(String.class, HttpsKey.PATH), "queryPath is empty");
 		Ensure.notNull(queryInterfaceProfile.get(HttpMethod.class, HttpsKey.METHOD), "queryMethod is null");
 		
-		this.httpsClient = communicator.client();
-		this.queryInterfaceProfile = queryInterfaceProfile;
+		this.communicator = communicator;
+		this.queryHttpsClient = communicator.client(queryInterfaceProfile);
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -80,12 +80,12 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 			if (operation.getOperation().equalsIgnoreCase(this.registerOperation)) {
 				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for register operation");
 				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for register operation");
-				this.registerInterfaceProfile = interfaceProfile;
+				this.registerHttpsClient = communicator.client(interfaceProfile);
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.unregisterOperation)) {
 				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for unregister operation");
 				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for unregister operation");
-				this.unregisterInterfaceProfile = interfaceProfile;
+				this.unregisterHttpsClient = communicator.client(interfaceProfile);
 			}
 		}
 		

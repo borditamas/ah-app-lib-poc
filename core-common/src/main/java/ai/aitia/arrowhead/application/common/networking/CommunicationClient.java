@@ -1,11 +1,11 @@
 package ai.aitia.arrowhead.application.common.networking;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
-import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
+import ai.aitia.arrowhead.application.common.networking.profile.model.QueryParams;
 
 public interface CommunicationClient {
 	
-	void initialize();
-	boolean isInitialized();
-	<T,P> T send(final InterfaceProfile interfaceProfile, final Class<T> responseType, final P payload) throws CommunicationException;
+	void send(final Object payload) throws CommunicationException;
+	void send(final QueryParams params, final Object payload) throws CommunicationException;
+	<T>T receive(final Class<T> type) throws CommunicationException;
 }
