@@ -7,7 +7,7 @@
 		<version>5.0.0.0</version>
 	</parent>
 	
-	<artifactId>arrowhead-application-lib-core-support-choreographer</artifactId>
+	<artifactId>arrowhead-application-lib-core-support-datamanager</artifactId>
 	<packaging>jar</packaging>
 	
 	<dependencies>
