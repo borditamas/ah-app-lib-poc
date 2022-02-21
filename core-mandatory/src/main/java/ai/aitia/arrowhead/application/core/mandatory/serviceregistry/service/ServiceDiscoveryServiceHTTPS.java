@@ -3,6 +3,7 @@ package ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service;
 import java.util.List;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
+import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
@@ -21,7 +22,7 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	
 	private final String name = "service-discovery";
 	
-	private final Communicator https;
+	private final CommunicationClient httpsClient;
 	
 	private final String queryOperation = "query";
 	private final InterfaceProfile queryInterfaceProfile;
@@ -36,10 +37,10 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceDiscoveryServiceHTTPS(final Communicator https, final InterfaceProfile queryInterfaceProfile) {
-		Ensure.notNull(https, "Communicator is null");
-		Ensure.isTrue(https.getType() == CommunicatorType.HTTPS, "Communicator is not for HTTPS");
-		Ensure.isTrue(https.isInitialized(), "https is not initialized");
+	public ServiceDiscoveryServiceHTTPS(final Communicator<CommunicationClient> communicator, final InterfaceProfile queryInterfaceProfile) {
+		Ensure.notNull(communicator, "Communicator is null");
+		Ensure.isTrue(communicator.type() == CommunicatorType.HTTPS, "Communicator is not for HTTPS");
+		Ensure.isTrue(communicator.isInitialized(), "httpsClient is not initialized");
 		
 		Ensure.isTrue(queryInterfaceProfile.getProtocol() == Protocol.HTTP, "queryInterfaceProfile is not for HTTPS");
 		Ensure.notEmpty(queryInterfaceProfile.getAddress(), "address is empty");
@@ -47,7 +48,7 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		Ensure.notEmpty(queryInterfaceProfile.get(String.class, HttpsKey.PATH), "queryPath is empty");
 		Ensure.notNull(queryInterfaceProfile.get(HttpMethod.class, HttpsKey.METHOD), "queryMethod is null");
 		
-		this.https = https;
+		this.httpsClient = communicator.client();
 		this.queryInterfaceProfile = queryInterfaceProfile;
 	}
 	

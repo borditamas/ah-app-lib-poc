@@ -5,6 +5,7 @@ import java.util.List;
 import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
+import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
@@ -31,7 +32,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceRegistryClient(final Communicator communicator, final InterfaceProfile queryInterfaceProfile) {
+	public ServiceRegistryClient(final Communicator<CommunicationClient> communicator, final InterfaceProfile queryInterfaceProfile) {
 		super(communicator);
 		this.queryInterfaceProfile = queryInterfaceProfile;
 		

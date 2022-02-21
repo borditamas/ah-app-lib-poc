@@ -18,10 +18,7 @@ public class CommunicationProperties {
 	private final String trustStorePassword;
 	private final Path trustStorePath;
 	
-	private boolean disableHostnameVerifier = false;
-	private int connectionTimeout = 30000;
-	private int socketTimeout = 30000;
-	private int connectionManagerTimeout = 10000;
+	private boolean disableHostnameVerifier = false;	
 	
 	//=================================================================================================
 	// methods
@@ -51,13 +48,7 @@ public class CommunicationProperties {
 	public String getTrustStorePassword() { return trustStorePassword; }
 	public Path getTrustStorePath() { return trustStorePath; }
 	public boolean isDisableHostnameVerifier() { return disableHostnameVerifier; }
-	public int getConnectionTimeout() { return connectionTimeout; }
-	public int getSocketTimeout() { return socketTimeout; }
 
 	//-------------------------------------------------------------------------------------------------
 	public void setDisableHostnameVerifier(final boolean disableHostnameVerifier) { this.disableHostnameVerifier = disableHostnameVerifier; }
-	public void setConnectionTimeout(final int connectionTimeout) { this.connectionTimeout = connectionTimeout; } 
-	public void setSocketTimeout(final int socketTimeout) { this.socketTimeout = socketTimeout; }
-	public int getConnectionManagerTimeout() { return connectionManagerTimeout; }
-	public void setConnectionManagerTimeout(final int connectionManagerTimeout) { this.connectionManagerTimeout = connectionManagerTimeout; }
 }

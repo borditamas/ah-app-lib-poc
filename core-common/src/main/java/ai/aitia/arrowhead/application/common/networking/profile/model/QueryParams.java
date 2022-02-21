@@ -1,4 +1,4 @@
-package ai.aitia.arrowhead.application.common.networking.profile.http.model;
+package ai.aitia.arrowhead.application.common.networking.profile.model;
 
 import java.util.ArrayList;
 import java.util.List;

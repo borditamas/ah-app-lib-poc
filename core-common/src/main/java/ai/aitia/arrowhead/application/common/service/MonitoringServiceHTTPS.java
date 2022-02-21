@@ -1,6 +1,7 @@
 package ai.aitia.arrowhead.application.common.service;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
+import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
@@ -18,7 +19,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	
 	private final String name = "monitoring";
 	
-	private Communicator https;	
+	private CommunicationClient httpsClient;	
 	
 	private final String echoOperation = "echo";
 	private InterfaceProfile echoInterfaceProfile;
@@ -27,11 +28,11 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public MonitoringServiceHTTPS(final Communicator https) {
-		Ensure.notNull(https, "Communicator is null");
-		Ensure.isTrue(https.getType() == CommunicatorType.HTTPS, "Communicator is not for HTTPS");
-		Ensure.isTrue(https.isInitialized(), "https is not initialized");
-		this.https = https;
+	public MonitoringServiceHTTPS(final Communicator<CommunicationClient> communicator) {
+		Ensure.notNull(communicator, "Communicator is null");
+		Ensure.isTrue(communicator.type() == CommunicatorType.HTTPS, "Communicator is not for HTTPS");
+		Ensure.isTrue(communicator.isInitialized(), "https is not initialized");
+		this.httpsClient = communicator.client();
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -83,7 +84,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	@Override
 	public boolean echo() {
 		try {
-			https.send(this.echoInterfaceProfile, Void.class);
+			httpsClient.send(this.echoInterfaceProfile, Void.class, null);
 			return true;
 		} catch (final CommunicationException ex) {
 			return false;
