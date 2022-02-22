@@ -19,7 +19,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	
 	private final String name = "monitoring";
 	
-	private Communicator<CommunicationClient> communicator;	
+	private Communicator communicator;	
 	
 	private final String echoOperation = "echo";
 	private CommunicationClient echoHttpsClient;
@@ -28,7 +28,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public MonitoringServiceHTTPS(final Communicator<CommunicationClient> communicator) {
+	public MonitoringServiceHTTPS(final Communicator communicator) {
 		Ensure.notNull(communicator, "Communicator is null");
 		Ensure.isTrue(communicator.type() == CommunicatorType.HTTPS, "Communicator is not for HTTPS");
 		Ensure.isTrue(communicator.isInitialized(), "https is not initialized");
@@ -85,7 +85,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	public boolean echo() {
 		try {
 			echoHttpsClient.send(null);
-			echoHttpsClient.receive(Object.class); // Late it will contain some data
+			echoHttpsClient.receive(Object.class); // Later it will contain some data
 			return true;
 		} catch (final CommunicationException ex) {
 			return false;

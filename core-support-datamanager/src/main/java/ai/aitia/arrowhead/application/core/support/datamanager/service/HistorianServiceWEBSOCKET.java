@@ -19,9 +19,9 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 	//=================================================================================================
 	// members
 	
-	private final String name = "monitoring";
+	private final String name = "historian";
 	
-	private Communicator<CommunicationClient> communicator;	
+	private Communicator communicator;	
 	
 	private final String getDataOperation = "get-data";
 	private CommunicationClient getDataWSClient;
@@ -33,25 +33,27 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public HistorianServiceWEBSOCKET(final Communicator<CommunicationClient> communicator) {
+	public HistorianServiceWEBSOCKET(final Communicator communicator) {
 		Ensure.notNull(communicator, "Communicator is null");
 		Ensure.isTrue(communicator.type() == CommunicatorType.WEBSOCKET, "Communicator is not for WEBSOCKET");
 		Ensure.isTrue(communicator.isInitialized(), "Communicator is not initialized");
 		this.communicator = communicator;
 	}
 	
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public String getServiceName() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.name;
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public ServiceQueryModel getServiceQueryForm() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void load(final ServiceModel service) {
 		Ensure.notNull(service, "service is null");
@@ -78,18 +80,20 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 		}			
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void verify() {
 		// TODO Auto-generated method stub
 		
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public List<String> getData() throws CommunicationException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getDataWSClient.receive(List.class);
 	}
 	
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void putData(final List<String> senML) throws CommunicationException {
 		this.putDataWSClient.send(senML);

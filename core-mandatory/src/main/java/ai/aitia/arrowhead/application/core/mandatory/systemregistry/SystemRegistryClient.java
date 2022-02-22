@@ -7,7 +7,7 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
+import ai.aitia.arrowhead.application.common.networking.profile.CommunicatorProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
@@ -19,7 +19,6 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	//=================================================================================================
 	// members
 	
-	private final boolean initialized = false;
 	private final ServiceRegistryClient srClient;
 	
 	private MonitoringService monitoringService;
@@ -28,30 +27,20 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public SystemRegistryClient(final Communicator communicator, final ServiceRegistryClient srClient) {
-		super(communicator);
+	public SystemRegistryClient(final CommunicatorProfile communicatorProfile, final ServiceRegistryClient srClient) {
+		super(communicatorProfile);
 		this.srClient = srClient;
 		
-		Ensure.notNull(super.communicator, "communicator is null.");
+		Ensure.notNull(super.communicatorProfile, "communicatorProfile is null.");
 		Ensure.notNull(this.srClient, "srClient is null.");
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public CommunicatorType getCommunicatorType() {
-		return super.communicatorType;
-	}
-
-	//-------------------------------------------------------------------------------------------------
-	@Override
 	public void initialize() {
 		try {
 			this.srClient.verifyInitialization();
-			super.communicator.initialize();
 			initializeServices();
-			
-			Ensure.notEmpty(super.address, "address is empty");
-			Ensure.portRange(super.port);
 			// TODO: info log
 			
 		} catch (final Exception ex) {
@@ -63,7 +52,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public boolean isInitialized() {
-		return this.initialized;
+		return this.monitoringService != null;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -94,18 +83,16 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	private void initializeServices() {
-		switch (super.communicatorType) {
-		case HTTPS:
-			this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(this.communicator));
-			break;
-
-		default:
-			throw new InitializationException("Unsupported communicator type: " + super.communicatorType.name());
-		}
+		if (super.communicatorProfile.contains(MonitoringService.NAME)) {
+			final Communicator communicator = super.communicatorProfile.communicator(MonitoringService.NAME);
+			if (communicator != null && communicator.type() == CommunicatorType.HTTPS) {
+				this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(communicator));
+			}			
+		}		
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private MonitoringService createMonitoringService(final MonitoringService monitoring) {		
+	private MonitoringServiceHTTPS createMonitoringService(final MonitoringServiceHTTPS monitoring) {		
 		List<ServiceModel> services;
 		try {
 			services = srClient.serviceDiscoveryService().query(monitoring.getServiceQueryForm());
@@ -123,10 +110,6 @@ public class SystemRegistryClient extends AbstractCoreClient {
 		final ServiceModel serviceModel = services.get(0);
 		monitoring.load(serviceModel);
 		monitoring.verify();
-		
-		//We use this init to set the network address of the system
-		super.setNetworkAddress(serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getAddress(),
-								serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getPort());
 		
 		return monitoring;
 	}

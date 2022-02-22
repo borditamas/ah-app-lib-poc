@@ -8,4 +8,5 @@ public interface CommunicationClient {
 	void send(final Object payload) throws CommunicationException;
 	void send(final QueryParams params, final Object payload) throws CommunicationException;
 	<T>T receive(final Class<T> type) throws CommunicationException;
+	void disconnect() throws CommunicationException;
 }

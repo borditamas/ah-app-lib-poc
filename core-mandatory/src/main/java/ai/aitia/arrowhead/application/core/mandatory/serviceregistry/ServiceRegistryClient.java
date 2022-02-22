@@ -5,11 +5,10 @@ import java.util.List;
 import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
-import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
+import ai.aitia.arrowhead.application.common.networking.profile.CommunicatorProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
-import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
@@ -22,7 +21,6 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	//=================================================================================================
 	// members
 	
-	private boolean initialized = false;
 	private final InterfaceProfile queryInterfaceProfile;
 	
 	private ServiceDiscoveryService serviceDiscoveryService;
@@ -32,27 +30,19 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceRegistryClient(final Communicator<CommunicationClient> communicator, final InterfaceProfile queryInterfaceProfile) {
-		super(communicator);
+	public ServiceRegistryClient(final CommunicatorProfile communicatorProfile, final InterfaceProfile queryInterfaceProfile) {
+		super(communicatorProfile);
 		this.queryInterfaceProfile = queryInterfaceProfile;
 		
-		Ensure.notNull(super.communicator, "communicator is null.");
+		Ensure.notNull(super.communicatorProfile, "communicatorProfile is null.");
 		Ensure.notNull(this.queryInterfaceProfile, "queryInterfaceProfile is null.");
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public CommunicatorType getCommunicatorType() {
-		return super.communicatorType;
-	}
-
-	//-------------------------------------------------------------------------------------------------
-	@Override
 	public void initialize() {
 		try {
-			super.communicator.initialize();
 			initializeServices();
-			this.initialized = true;
 			// TODO: info log
 			
 		} catch (final Exception ex) {
@@ -64,7 +54,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public boolean isInitialized() {
-		return initialized;
+		return this.serviceDiscoveryService != null && this.monitoringService != null;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
@@ -101,19 +91,23 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	private void initializeServices() {
-		switch (super.communicatorType) {
-		case HTTPS:
-			this.serviceDiscoveryService = createServiceDiscoveryService(new ServiceDiscoveryServiceHTTPS(super.communicator, this.queryInterfaceProfile));
-			this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(super.communicator));
-			break;
-
-		default:
-			throw new InitializationException("Unsupported communicator type: " + super.communicatorType.name());
+		if (super.communicatorProfile.contains(ServiceDiscoveryService.NAME)) {
+			final Communicator communicator = super.communicatorProfile.communicator(ServiceDiscoveryService.NAME);
+			if (communicator != null && communicator.type() == CommunicatorType.HTTPS) {
+				this.serviceDiscoveryService = createServiceDiscoveryService(new ServiceDiscoveryServiceHTTPS(communicator, this.queryInterfaceProfile));
+			}			
 		}
+		
+		if (super.communicatorProfile.contains(MonitoringService.NAME)) {
+			final Communicator communicator = super.communicatorProfile.communicator(MonitoringService.NAME);
+			if (communicator != null && communicator.type() == CommunicatorType.HTTPS) {
+				this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(communicator));
+			}			
+		}	
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private ServiceDiscoveryService createServiceDiscoveryService(final ServiceDiscoveryServiceHTTPS serviceDiscovery) {
+	private ServiceDiscoveryServiceHTTPS createServiceDiscoveryService(final ServiceDiscoveryServiceHTTPS serviceDiscovery) {
 		List<ServiceModel> services;
 		try {
 			services = serviceDiscoveryService.query(serviceDiscovery.getServiceQueryForm());
@@ -128,17 +122,12 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 		
 		final ServiceModel serviceModel = services.get(0);
 		serviceDiscovery.load(serviceModel);		
-		serviceDiscovery.verify();
-		
-		//We use this init to set the network address of the system
-		super.setNetworkAddress(serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getAddress(),
-								serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getPort());
-		
+		serviceDiscovery.verify();		
 		return serviceDiscovery;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private MonitoringService createMonitoringService(final MonitoringServiceHTTPS monitoring) {
+	private MonitoringServiceHTTPS createMonitoringService(final MonitoringServiceHTTPS monitoring) {
 		List<ServiceModel> services;
 		try {
 			services = serviceDiscoveryService.query(monitoring.getServiceQueryForm());

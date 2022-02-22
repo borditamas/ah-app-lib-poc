@@ -7,39 +7,36 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
+import ai.aitia.arrowhead.application.common.networking.profile.CommunicatorProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.ServiceRegistryClient;
+import ai.aitia.arrowhead.application.core.support.datamanager.service.HistorianService;
+import ai.aitia.arrowhead.application.core.support.datamanager.service.HistorianServiceHTTPS;
+import ai.aitia.arrowhead.application.core.support.datamanager.service.HistorianServiceWEBSOCKET;
 
 public class DatamanagerClient extends AbstractCoreClient {
 
 	//=================================================================================================
 	// members
 	
-	private final boolean initialized = false;
 	private final ServiceRegistryClient srClient;
 	
 	private MonitoringService monitoringService;
+	private HistorianService historianService;
 	
 	//=================================================================================================
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public DatamanagerClient(final Communicator communicator, final ServiceRegistryClient srClient) {
-		super(communicator);
+	public DatamanagerClient(final CommunicatorProfile communicatorProfile, final ServiceRegistryClient srClient) {
+		super(communicatorProfile);
 		this.srClient = srClient;
 		
-		Ensure.notNull(super.communicator, "communicator is null.");
+		Ensure.notNull(super.communicatorProfile, "communicatorProfile is null.");
 		Ensure.notNull(this.srClient, "srClient is null.");
-	}
-
-	//-------------------------------------------------------------------------------------------------
-	@Override
-	public CommunicatorType getCommunicatorType() {
-		return super.communicatorType;
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -47,11 +44,7 @@ public class DatamanagerClient extends AbstractCoreClient {
 	public void initialize() {
 		try {
 			this.srClient.verifyInitialization();
-			super.communicator.initialize();
 			initializeServices();
-			
-			Ensure.notEmpty(super.address, "address is empty");
-			Ensure.portRange(super.port);
 			// TODO: info log
 			
 		} catch (final Exception ex) {
@@ -63,7 +56,7 @@ public class DatamanagerClient extends AbstractCoreClient {
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public boolean isInitialized() {
-		return this.initialized;
+		return this.monitoringService != null && this.historianService != null;
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -88,24 +81,44 @@ public class DatamanagerClient extends AbstractCoreClient {
 		verifyInitialization();
 		return this.monitoringService;
 	}
+	
+	//-------------------------------------------------------------------------------------------------
+	public HistorianService historianService() {
+		verifyInitialization();
+		return this.historianService;
+	}
 
 	//=================================================================================================
 	// assistant methods
 	
 	//-------------------------------------------------------------------------------------------------
 	private void initializeServices() {
-		switch (super.communicatorType) {
-		case HTTPS:
-			this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(this.communicator));
-			break;
-
-		default:
-			throw new InitializationException("Unsupported communicator type: " + super.communicatorType.name());
+		if (super.communicatorProfile.contains(MonitoringService.NAME)) {
+			final Communicator communicator = super.communicatorProfile.communicator(MonitoringService.NAME);
+			if (communicator != null && communicator.type() == CommunicatorType.HTTPS) {
+				this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(communicator));
+			}			
+		}
+		
+		if (super.communicatorProfile.contains(HistorianService.NAME)) {
+			final Communicator communicator = super.communicatorProfile.communicator(HistorianService.NAME);
+			if (communicator != null ) {
+				switch (communicator.type()) {
+				case HTTPS:
+					this.historianService = createHistorianService(new HistorianServiceHTTPS(communicator));
+					break;
+				case WEBSOCKET:
+					this.historianService = createHistorianService(new HistorianServiceWEBSOCKET(communicator));
+					break;
+				default:
+					throw new InitializationException("");
+				}
+			}			
 		}
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private MonitoringService createMonitoringService(final MonitoringService monitoring) {		
+	private MonitoringServiceHTTPS createMonitoringService(final MonitoringServiceHTTPS monitoring) {		
 		List<ServiceModel> services;
 		try {
 			services = srClient.serviceDiscoveryService().query(monitoring.getServiceQueryForm());
@@ -124,10 +137,29 @@ public class DatamanagerClient extends AbstractCoreClient {
 		monitoring.load(serviceModel);
 		monitoring.verify();
 		
-		//We use this init to set the network address of the system
-		super.setNetworkAddress(serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getAddress(),
-								serviceModel.getOperations().get(0).getInterfaceProfiles().get(Protocol.valueOf(super.communicatorType)).getPort());
-		
 		return monitoring;
+	}
+	
+	//-------------------------------------------------------------------------------------------------
+	private HistorianService createHistorianService(final HistorianService historian)  {
+		List<ServiceModel> services;
+		try {
+			services = srClient.serviceDiscoveryService().query(historian.getServiceQueryForm());
+		} catch (final InitializationException ex) {
+			throw new InitializationException("Service Registry is not initialized.");
+			
+		} catch (final CommunicationException ex) {
+			throw new InitializationException("CommunicationException occured while querying " + historian.getServiceName() + " service", ex);
+		}
+		
+		if (services.size() < 1) {
+			throw new InitializationException(historian.getServiceName() + " service was not discovered.");
+		}
+		
+		final ServiceModel serviceModel = services.get(0);
+		historian.load(serviceModel);
+		historian.verify();
+		
+		return historian;
 	}
 }

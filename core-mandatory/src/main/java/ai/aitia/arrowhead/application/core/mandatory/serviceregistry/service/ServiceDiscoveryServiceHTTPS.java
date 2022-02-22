@@ -22,7 +22,7 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	
 	private final String name = "service-discovery";
 	
-	private final Communicator<CommunicationClient> communicator;
+	private final Communicator communicator;
 	
 	private final String queryOperation = "query";
 	private final CommunicationClient queryHttpsClient;
@@ -37,7 +37,7 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceDiscoveryServiceHTTPS(final Communicator<CommunicationClient> communicator, final InterfaceProfile queryInterfaceProfile) {
+	public ServiceDiscoveryServiceHTTPS(final Communicator communicator, final InterfaceProfile queryInterfaceProfile) {
 		Ensure.notNull(communicator, "Communicator is null");
 		Ensure.isTrue(communicator.type() == CommunicatorType.HTTPS, "Communicator is not for HTTPS");
 		Ensure.isTrue(communicator.isInitialized(), "httpsClient is not initialized");
