@@ -7,7 +7,7 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.networking.profile.CommunicatorProfile;
+import ai.aitia.arrowhead.application.common.networking.profile.CommunicationProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
@@ -31,11 +31,11 @@ public class DatamanagerClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public DatamanagerClient(final CommunicatorProfile communicatorProfile, final ServiceRegistryClient srClient) {
-		super(communicatorProfile);
+	public DatamanagerClient(final CommunicationProfile communicationProfile, final ServiceRegistryClient srClient) {
+		super(communicationProfile);
 		this.srClient = srClient;
 		
-		Ensure.notNull(super.communicatorProfile, "communicatorProfile is null.");
+		Ensure.notNull(super.communicationProfile, "communicationProfile is null.");
 		Ensure.notNull(this.srClient, "srClient is null.");
 	}
 
@@ -51,6 +51,7 @@ public class DatamanagerClient extends AbstractCoreClient {
 			// TODO: error log
 			throw new InitializationException(ex.getMessage(), ex);
 		}
+		verifyInitialization();
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -93,15 +94,15 @@ public class DatamanagerClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	private void initializeServices() {
-		if (super.communicatorProfile.contains(MonitoringService.NAME)) {
-			final Communicator communicator = super.communicatorProfile.communicator(MonitoringService.NAME);
+		if (super.communicationProfile.contains(MonitoringService.NAME)) {
+			final Communicator communicator = super.communicationProfile.communicator(MonitoringService.NAME);
 			if (communicator != null && communicator.type() == CommunicatorType.HTTPS) {
 				this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(communicator));
 			}			
 		}
 		
-		if (super.communicatorProfile.contains(HistorianService.NAME)) {
-			final Communicator communicator = super.communicatorProfile.communicator(HistorianService.NAME);
+		if (super.communicationProfile.contains(HistorianService.NAME)) {
+			final Communicator communicator = super.communicationProfile.communicator(HistorianService.NAME);
 			if (communicator != null ) {
 				switch (communicator.type()) {
 				case HTTPS:

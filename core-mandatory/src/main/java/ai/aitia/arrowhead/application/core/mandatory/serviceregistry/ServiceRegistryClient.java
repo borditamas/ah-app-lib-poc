@@ -7,7 +7,7 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.networking.profile.CommunicatorProfile;
+import ai.aitia.arrowhead.application.common.networking.profile.CommunicationProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
@@ -30,11 +30,11 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public ServiceRegistryClient(final CommunicatorProfile communicatorProfile, final InterfaceProfile queryInterfaceProfile) {
-		super(communicatorProfile);
+	public ServiceRegistryClient(final CommunicationProfile communicationProfile, final InterfaceProfile queryInterfaceProfile) {
+		super(communicationProfile);
 		this.queryInterfaceProfile = queryInterfaceProfile;
 		
-		Ensure.notNull(super.communicatorProfile, "communicatorProfile is null.");
+		Ensure.notNull(super.communicationProfile, "communicationProfile is null.");
 		Ensure.notNull(this.queryInterfaceProfile, "queryInterfaceProfile is null.");
 	}
 	
@@ -49,6 +49,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 			// TODO: error log
 			throw new InitializationException(ex.getMessage(), ex);
 		}
+		verifyInitialization();
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -91,19 +92,19 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	
 	//-------------------------------------------------------------------------------------------------
 	private void initializeServices() {
-		if (super.communicatorProfile.contains(ServiceDiscoveryService.NAME)) {
-			final Communicator communicator = super.communicatorProfile.communicator(ServiceDiscoveryService.NAME);
+		if (super.communicationProfile.contains(ServiceDiscoveryService.NAME)) {
+			final Communicator communicator = super.communicationProfile.communicator(ServiceDiscoveryService.NAME);
 			if (communicator != null && communicator.type() == CommunicatorType.HTTPS) {
 				this.serviceDiscoveryService = createServiceDiscoveryService(new ServiceDiscoveryServiceHTTPS(communicator, this.queryInterfaceProfile));
 			}			
 		}
 		
-		if (super.communicatorProfile.contains(MonitoringService.NAME)) {
-			final Communicator communicator = super.communicatorProfile.communicator(MonitoringService.NAME);
+		if (super.communicationProfile.contains(MonitoringService.NAME)) {
+			final Communicator communicator = super.communicationProfile.communicator(MonitoringService.NAME);
 			if (communicator != null && communicator.type() == CommunicatorType.HTTPS) {
 				this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(communicator));
 			}			
-		}	
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------------------

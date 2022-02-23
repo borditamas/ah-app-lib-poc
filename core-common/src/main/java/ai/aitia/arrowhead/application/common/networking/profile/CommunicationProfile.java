@@ -5,7 +5,7 @@ import java.util.Map;
 
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 
-public class CommunicatorProfile {
+public class CommunicationProfile {
 
 	//=================================================================================================
 	// members
