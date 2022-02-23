@@ -5,8 +5,8 @@ import ai.aitia.arrowhead.application.common.networking.profile.model.QueryParam
 
 public interface CommunicationClient {
 	
-	void send(final Object payload) throws CommunicationException;
-	void send(final QueryParams params, final Object payload) throws CommunicationException;
-	<T>T receive(final Class<T> type) throws CommunicationException;
-	void disconnect() throws CommunicationException;
+	public void send(final Object payload) throws CommunicationException;
+	public void send(final QueryParams params, final Object payload) throws CommunicationException;
+	public <T>T receive(final Class<T> type) throws CommunicationException;
+	public void disconnect() throws CommunicationException;
 }

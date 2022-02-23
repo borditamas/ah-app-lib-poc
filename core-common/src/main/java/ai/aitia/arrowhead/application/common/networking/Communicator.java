@@ -4,9 +4,9 @@ import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile
 
 public interface Communicator {
 
-	CommunicatorType type();
-	void properties(final CommunicationProperties props);
-	void initialize();
-	boolean isInitialized();
-	CommunicationClient client(final InterfaceProfile interfaceProfile);
+	public CommunicatorType type();
+	public void properties(final CommunicationProperties props);
+	public void initialize();
+	public boolean isInitialized();
+	public CommunicationClient client(final InterfaceProfile interfaceProfile);
 }
