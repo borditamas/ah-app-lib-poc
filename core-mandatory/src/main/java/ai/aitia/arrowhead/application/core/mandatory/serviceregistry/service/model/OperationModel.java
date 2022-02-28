@@ -1,4 +1,4 @@
-package ai.aitia.arrowhead.application.common.service.model;
+package ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model;
 
 import java.util.Map;
 

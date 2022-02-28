@@ -6,9 +6,9 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
-import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceQueryModel;
 
 public class HistorianServiceHTTPS implements HistorianService {
 

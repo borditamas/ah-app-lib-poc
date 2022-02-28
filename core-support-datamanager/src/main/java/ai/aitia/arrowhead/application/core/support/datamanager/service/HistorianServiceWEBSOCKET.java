@@ -9,10 +9,10 @@ import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.networking.profile.websocket.WebsocketKey;
-import ai.aitia.arrowhead.application.common.service.model.OperationModel;
-import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
-import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.OperationModel;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceQueryModel;
 
 public class HistorianServiceWEBSOCKET implements HistorianService {
 

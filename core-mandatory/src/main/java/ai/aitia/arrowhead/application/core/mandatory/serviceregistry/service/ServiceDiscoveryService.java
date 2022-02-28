@@ -4,8 +4,8 @@ import java.util.List;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.service.ArrowheadService;
-import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
-import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceQueryModel;
 
 public interface ServiceDiscoveryService extends ArrowheadService {
 	

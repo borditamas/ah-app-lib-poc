@@ -9,12 +9,12 @@ public class MessageProperties {
 
 	private final Map<String,Object> map = new HashMap<>();
 	
-	public void add(final ProtocolKey key, final Object value) {
+	public void add(final MessageKey key, final Object value) {
 		this.map.put(key.name(), value);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> T get(final Class<T> castTo, final ProtocolKey key) {
+	public <T> T get(final Class<T> castTo, final MessageKey key) {
 		final Object o = this.map.get(key.name());
 		if (o == null) {
 			return null;
@@ -24,7 +24,7 @@ public class MessageProperties {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> T getOrDefault(final Class<T> castTo, final ProtocolKey key, final T defaultValue) {
+	public <T> T getOrDefault(final Class<T> castTo, final MessageKey key, final T defaultValue) {
 		final Object o = this.map.get(key.name());
 		if (o == null) {
 			return defaultValue;

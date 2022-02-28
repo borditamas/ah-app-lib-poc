@@ -4,5 +4,5 @@ import ai.aitia.arrowhead.application.common.networking.profile.ProtocolKey;
 
 public enum HttpsKey implements ProtocolKey {
 	
-	METHOD, PATH, PATH_VARIABLES, QUERY_PARAMETERS;
+	METHOD, PATH;
 }

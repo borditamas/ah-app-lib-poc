@@ -1,7 +1,7 @@
 package ai.aitia.arrowhead.application.common.service;
 
-import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
-import ai.aitia.arrowhead.application.common.service.model.ServiceQueryModel;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceQueryModel;
 
 public interface ArrowheadService {
 	

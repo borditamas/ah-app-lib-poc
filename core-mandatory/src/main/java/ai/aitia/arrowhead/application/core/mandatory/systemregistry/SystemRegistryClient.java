@@ -10,9 +10,9 @@ import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.CommunicationProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
-import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.ServiceRegistryClient;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
 
 public class SystemRegistryClient extends AbstractCoreClient {
 	

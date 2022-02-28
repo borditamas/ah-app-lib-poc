@@ -4,7 +4,7 @@ import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 
 public enum Protocol {
 
-	HTTP, WEBSOCKET;
+	HTTP, WEBSOCKET, MQTT;
 	
 	public static Protocol valueOf(CommunicatorType communicatorType) {
 		switch (communicatorType) {
@@ -13,6 +13,9 @@ public enum Protocol {
 			
 		case WEBSOCKET:
 			return Protocol.WEBSOCKET;
+			
+		case MQTT:
+			return Protocol.MQTT;
 
 		default:
 			// TODO throw;

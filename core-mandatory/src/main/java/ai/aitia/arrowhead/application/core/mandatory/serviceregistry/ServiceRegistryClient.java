@@ -11,10 +11,10 @@ import ai.aitia.arrowhead.application.common.networking.profile.CommunicationPro
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
-import ai.aitia.arrowhead.application.common.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryService;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryServiceHTTPS;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
 
 public class ServiceRegistryClient extends AbstractCoreClient {
 
@@ -94,8 +94,17 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	private void initializeServices() {
 		if (super.communicationProfile.contains(ServiceDiscoveryService.NAME)) {
 			final Communicator communicator = super.communicationProfile.communicator(ServiceDiscoveryService.NAME);
-			if (communicator != null && communicator.type() == CommunicatorType.HTTPS) {
-				this.serviceDiscoveryService = createServiceDiscoveryService(new ServiceDiscoveryServiceHTTPS(communicator, this.queryInterfaceProfile));
+			if (communicator != null ) {
+				switch (communicator.type()) {
+				case HTTPS:
+					this.serviceDiscoveryService = createServiceDiscoveryService(new ServiceDiscoveryServiceHTTPS(communicator, this.queryInterfaceProfile));
+					break;
+				case MQTT:
+					//this.historianService = createHistorianService(new HistorianServiceWEBSOCKET(communicator));
+					break;
+				default:
+					throw new InitializationException("Communicator type not supported");
+				}
 			}			
 		}
 		
