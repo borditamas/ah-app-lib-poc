@@ -22,4 +22,14 @@ public class MessageProperties {
 		Ensure.isTrue(castTo.isAssignableFrom(o.getClass()), "Value for key " + key.name() + "cannot cast to" + castTo.getSimpleName());
 		return (T)o;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getOrDefault(final Class<T> castTo, final ProtocolKey key, final T defaultValue) {
+		final Object o = this.map.get(key.name());
+		if (o == null) {
+			return defaultValue;
+		}
+		Ensure.isTrue(castTo.isAssignableFrom(o.getClass()), "Value for key " + key.name() + "cannot cast to" + castTo.getSimpleName());
+		return (T)o;
+	}
 }
