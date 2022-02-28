@@ -7,7 +7,6 @@
  	<packaging>pom</packaging>
  	
  	<modules>
- 		<module>core-common</module>
  		<module>core-mandatory</module>
  		<module>core-support-eventhandler</module>
  		<module>core-support-datamanager</module>

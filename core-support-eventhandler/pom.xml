@@ -13,7 +13,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>ai.aitia</groupId>
-			<artifactId>arrowhead-application-lib-common</artifactId>
+			<artifactId>arrowhead-application-lib-core-mandatory</artifactId>
 			<version>5.0.0.0</version>
 		</dependency>
 	</dependencies>
