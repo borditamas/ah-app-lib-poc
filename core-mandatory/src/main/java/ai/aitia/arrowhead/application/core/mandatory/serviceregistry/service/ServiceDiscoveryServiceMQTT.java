@@ -114,6 +114,7 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		subscribePathVars.add(service.getName());
 		final MessageProperties props = new MessageProperties();
 		props.add(MqttMsgKey.PATH_VARIABLES_SUBSCRIBE, subscribePathVars);
+		props.add(MqttMsgKey.RECEIVE_TIMEOUT, true);
 		
 		this.registerMqttClient.send(props, new RegisterServiceRequestJSON(service));
 		final ServiceModel response = this.registerMqttClient.receive(RegisterServiceResponseJSON.class).convertToServiceModel();
@@ -128,6 +129,7 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		subscribePathVars.add(service.getName());
 		final MessageProperties props = new MessageProperties();
 		props.add(MqttMsgKey.PATH_VARIABLES_SUBSCRIBE, subscribePathVars);
+		props.add(MqttMsgKey.RECEIVE_TIMEOUT, true);
 		
 		this.unregisterMqttClient.send(props, service.getName());
 		final boolean response = this.unregisterMqttClient.receive(Boolean.class);
@@ -142,11 +144,11 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		//subscribePathVars.add(service.getRequesterSystemName());
 		final MessageProperties props = new MessageProperties();
 		props.add(MqttMsgKey.PATH_VARIABLES_SUBSCRIBE, subscribePathVars);
+		props.add(MqttMsgKey.RECEIVE_TIMEOUT, true);
 		
 		this.queryMqttClient.send(new ServiceQueryRequestJSON(from));
 		final List<ServiceModel> response = this.queryMqttClient.receive(ServiceQueryResponseJSON.class).convertToServiceModelList();
 		this.queryMqttClient.terminate();
 		return response;
 	}
-
 }
