@@ -10,6 +10,7 @@ public class MessageProperties {
 	private final Map<String,Object> map = new HashMap<>();
 	
 	public void add(final MessageKey key, final Object value) {
+		Ensure.isTrue(value.getClass().isAssignableFrom(key.getType()), "Value for key " + key.name() + "has invalid type" + key.getType().getSimpleName());
 		this.map.put(key.name(), value);
 	}
 	
