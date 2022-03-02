@@ -18,8 +18,6 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	//=================================================================================================
 	// members
 	
-	private final String name = "monitoring";
-	
 	private Communicator communicator;	
 	
 	private final String echoOperation = "echo";
@@ -39,7 +37,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public String getServiceName() {
-		return this.name;
+		return MonitoringService.NAME;
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -53,7 +51,7 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	@Override
 	public void load(final ServiceModel service) {
 		Ensure.notNull(service, "service is null");
-		Ensure.isTrue(service.getName().equalsIgnoreCase(this.name), "Service name missmatch");
+		Ensure.isTrue(service.getName().equalsIgnoreCase(MonitoringService.NAME), "Service name missmatch");
 		Ensure.notEmpty(service.getOperations(), "operation list is empty");
 		
 		for (final OperationModel operation : service.getOperations()) {
