@@ -4,5 +4,15 @@ import ai.aitia.arrowhead.application.common.networking.profile.ProtocolKey;
 
 public enum WebsocketKey implements ProtocolKey {
 
-	PATH, PARTIAL_MSG_SUPPORT;
+	PATH(String.class),
+	PARTIAL_MSG_SUPPORT(Boolean.class);
+	
+	private Class<?> type;
+
+	private WebsocketKey(final Class<?> type) {
+		this.type = type;
+	}
+
+	@Override
+	public Class<?> getType() { return type; }
 }
