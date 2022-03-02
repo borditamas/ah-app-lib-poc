@@ -36,36 +36,42 @@ public class HistorianServiceHTTPS implements HistorianService {
 		this.communicator = communicator;
 	}
 	
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public String getServiceName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public ServiceQueryModel getServiceQueryForm() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void load(ServiceModel service) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void verify() {
 		// TODO Auto-generated method stub
 		
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public List<String> getData() throws CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void putData(List<String> senML) throws CommunicationException {
 		// TODO Auto-generated method stub

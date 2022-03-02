@@ -25,6 +25,7 @@ public class InterfaceProfile {
 	
 	//-------------------------------------------------------------------------------------------------
 	public void put(final ProtocolKey key, final Object value) {
+		Ensure.isTrue(key.getType().isAssignableFrom(value.getClass()), "Value for key " + key.name() + "has invalid type. Must be " + key.getType().getSimpleName());
 		this.properties.put(key.name(), value);
 	}
 	
