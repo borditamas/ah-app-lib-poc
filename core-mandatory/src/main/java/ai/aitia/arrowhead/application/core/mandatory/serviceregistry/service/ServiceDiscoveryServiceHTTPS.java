@@ -7,6 +7,7 @@ import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
+import ai.aitia.arrowhead.application.common.networking.PayloadResolver;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.MessageProperties;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
@@ -117,7 +118,9 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	@Override
 	public ServiceModel register(final ServiceModel service) throws CommunicationException {
 		this.registerHttpsClient.send(new RegisterServiceRequestJSON(service));
-		return this.registerHttpsClient.receive(RegisterServiceResponseJSON.class).convertToServiceModel();
+		final PayloadResolver<RegisterServiceResponseJSON> resolver = new PayloadResolver<>();
+		this.registerHttpsClient.receive(resolver);
+		return resolver.getPayload().convertToServiceModel();
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -128,8 +131,8 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		queryParams.add("service_name", service.getName());
 		final MessageProperties msgProps = new MessageProperties();
 		msgProps.add(HttpsMsgKey.QUERY_PARAMETERS, queryParams);
-		this.unregisterHttpsClient.send(msgProps, null);
-		this.unregisterHttpsClient.receive(Void.class);
+		this.unregisterHttpsClient.send(msgProps, null);		
+		this.unregisterHttpsClient.receive(null);
 		return true;
 	}
 
@@ -137,6 +140,8 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	@Override
 	public List<ServiceModel> query(final ServiceQueryModel form) throws CommunicationException {
 		this.queryHttpsClient.send(new ServiceQueryRequestJSON(form));
-		return this.queryHttpsClient.receive(ServiceQueryResponseJSON.class).convertToServiceModelList();
+		final PayloadResolver<ServiceQueryResponseJSON> resolver = new PayloadResolver<>();
+		this.queryHttpsClient.receive(resolver);
+		return resolver.getPayload().convertToServiceModelList();
 	}
 }

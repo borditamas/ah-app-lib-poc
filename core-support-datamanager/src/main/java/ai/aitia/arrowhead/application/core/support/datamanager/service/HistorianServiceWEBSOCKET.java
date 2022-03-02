@@ -6,6 +6,7 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
+import ai.aitia.arrowhead.application.common.networking.PayloadResolver;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
@@ -91,7 +92,9 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public List<String> getData() throws CommunicationException {
-		return this.getDataWSClient.receive(List.class);
+		final PayloadResolver<List<String>> payload = new PayloadResolver<>();
+		this.getDataWSClient.receive(new PayloadResolver<>());
+		return payload.getPayload();
 	}
 	
 	//-------------------------------------------------------------------------------------------------

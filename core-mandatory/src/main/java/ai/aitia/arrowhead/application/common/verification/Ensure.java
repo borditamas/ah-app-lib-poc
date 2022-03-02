@@ -57,4 +57,9 @@ public class Ensure {
 			throw new DeveloperException("port is out range");
 		}
 	}
+	
+	//-------------------------------------------------------------------------------------------------
+	public static void fail(final String msg) {
+		throw new DeveloperException(msg);
+	}
 }

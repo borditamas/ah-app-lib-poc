@@ -84,8 +84,8 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	@Override
 	public boolean echo() {
 		try {
-			echoHttpsClient.send(null);
-			echoHttpsClient.receive(Object.class); // Later it will contain some data
+			this.echoHttpsClient.send(null);
+			this.echoHttpsClient.receive(null); // Later it will contain some data
 			return true;
 		} catch (final CommunicationException ex) {
 			return false;

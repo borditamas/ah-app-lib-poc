@@ -7,6 +7,7 @@ import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
+import ai.aitia.arrowhead.application.common.networking.PayloadResolver;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.MessageProperties;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
@@ -117,7 +118,9 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		props.add(MqttMsgKey.RECEIVE_TIMEOUT, true);
 		
 		this.registerMqttClient.send(props, new RegisterServiceRequestJSON(service));
-		final ServiceModel response = this.registerMqttClient.receive(RegisterServiceResponseJSON.class).convertToServiceModel();
+		final PayloadResolver<RegisterServiceResponseJSON> resolver = new PayloadResolver<>();
+		this.registerMqttClient.receive(resolver);
+		final ServiceModel response = resolver.getPayload().convertToServiceModel();
 		this.registerMqttClient.terminate();
 		return response;
 	}
@@ -132,7 +135,9 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		props.add(MqttMsgKey.RECEIVE_TIMEOUT, true);
 		
 		this.unregisterMqttClient.send(props, service.getName());
-		final boolean response = this.unregisterMqttClient.receive(Boolean.class);
+		final PayloadResolver<Boolean> resolver = new PayloadResolver<>();
+		this.unregisterMqttClient.receive(resolver);
+		final boolean response = resolver.getPayload();
 		this.unregisterMqttClient.terminate();
 		return response;
 	}
@@ -147,7 +152,9 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		props.add(MqttMsgKey.RECEIVE_TIMEOUT, true);
 		
 		this.queryMqttClient.send(new ServiceQueryRequestJSON(from));
-		final List<ServiceModel> response = this.queryMqttClient.receive(ServiceQueryResponseJSON.class).convertToServiceModelList();
+		final PayloadResolver<ServiceQueryResponseJSON> resolver = new PayloadResolver<>();
+		this.queryMqttClient.receive(resolver);
+		final List<ServiceModel> response = resolver.getPayload().convertToServiceModelList();
 		this.queryMqttClient.terminate();
 		return response;
 	}
