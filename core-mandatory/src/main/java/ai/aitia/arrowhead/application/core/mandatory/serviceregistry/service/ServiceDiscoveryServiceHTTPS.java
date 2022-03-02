@@ -49,8 +49,8 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		Ensure.isTrue(communicator.isInitialized(), "Communicator is not initialized");
 		
 		Ensure.isTrue(queryInterfaceProfile.getProtocol() == Protocol.HTTP, "queryInterfaceProfile is not for HTTPS");
-		Ensure.notEmpty(queryInterfaceProfile.getAddress(), "address is empty");
-		Ensure.portRange(queryInterfaceProfile.getPort());
+		Ensure.notEmpty(queryInterfaceProfile.get(String.class, HttpsKey.ADDRESS), "address is empty");
+		Ensure.portRange(queryInterfaceProfile.get(Integer.class, HttpsKey.PORT));
 		Ensure.notEmpty(queryInterfaceProfile.get(String.class, HttpsKey.PATH), "queryPath is empty");
 		Ensure.notNull(queryInterfaceProfile.get(HttpMethod.class, HttpsKey.METHOD), "queryMethod is null");
 		

@@ -10,24 +10,18 @@ public class InterfaceProfile {
 	// members
 	
 	private final Protocol protocol;
-	private final String address;
-	private final int port;
 	private final HashMap<String,Object> properties = new HashMap<String,Object>();
 	
 	//=================================================================================================
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public InterfaceProfile(final Protocol protocol, final String address, final int port) {
+	public InterfaceProfile(final Protocol protocol) {
 		this.protocol = protocol;
-		this.address = address;
-		this.port = port;
 	}
 
 	//-------------------------------------------------------------------------------------------------
 	public Protocol getProtocol() { return protocol; }
-	public String getAddress() { return address; }
-	public int getPort() { return port; }
 	
 	//-------------------------------------------------------------------------------------------------
 	public void put(final ProtocolKey key, final Object value) {

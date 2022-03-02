@@ -6,6 +6,7 @@ import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
 import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.OperationModel;
@@ -61,10 +62,9 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.HTTP);
 			if (operation.getOperation().equalsIgnoreCase(this.echoOperation)) {
-				Ensure.notEmpty(interfaceProfile.getAddress(), "echo operation address is empty");
-				Ensure.portRange(interfaceProfile.getPort());
-				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for echo operation");
-				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for echo operation");
+				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.ADDRESS), "echo operation address is empty");
+				Ensure.portRange(interfaceProfile.get(Integer.class, HttpsKey.PORT));
+				Ensure.notNull(interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD), "no http method for echo operation");
 				this.echoHttpsClient = communicator.client(interfaceProfile);
 			}
 		}		

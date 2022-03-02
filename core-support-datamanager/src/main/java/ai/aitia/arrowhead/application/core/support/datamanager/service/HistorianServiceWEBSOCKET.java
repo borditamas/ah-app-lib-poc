@@ -8,6 +8,7 @@ import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
 import ai.aitia.arrowhead.application.common.networking.profile.websocket.WebsocketKey;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.OperationModel;
@@ -66,15 +67,15 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.WEBSOCKET);
 			if (operation.getOperation().equalsIgnoreCase(this.getDataOperation)) {
-				Ensure.notEmpty(interfaceProfile.getAddress(), "get-data operation address is empty");
-				Ensure.portRange(interfaceProfile.getPort());
-				Ensure.isTrue(interfaceProfile.contains(WebsocketKey.PATH), "no path for get-data operation");
+				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.ADDRESS), "get-data operation address is empty");
+				Ensure.portRange(interfaceProfile.get(Integer.class, HttpsKey.PORT));
+				Ensure.notEmpty(interfaceProfile.get(String.class, WebsocketKey.PATH), "no path for get-data operation");
 				this.getDataWSClient = communicator.client(interfaceProfile);
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.putDataOperation)) {
-				Ensure.notEmpty(interfaceProfile.getAddress(), "put-data operation address is empty");
-				Ensure.portRange(interfaceProfile.getPort());
-				Ensure.isTrue(interfaceProfile.contains(WebsocketKey.PATH), "no path for put-data operation");
+				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.ADDRESS), "put-data operation address is empty");
+				Ensure.portRange(interfaceProfile.get(Integer.class, HttpsKey.PORT));
+				Ensure.notEmpty(interfaceProfile.get(String.class, WebsocketKey.PATH), "no path for put-data operation");
 				this.putDataWSClient = communicator.client(interfaceProfile);
 			}
 		}			
