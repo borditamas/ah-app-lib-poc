@@ -52,7 +52,6 @@ public class PayloadResolver {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	@SuppressWarnings("unchecked")
 	public void add(final PayloadDecoder decoder, final String data, final Object fullMessage) {
 		Ensure.notNull(decoder, "PayloadDecoder is null");
 		Ensure.notNull(fullMessage, "fullMessage is null");
@@ -62,7 +61,6 @@ public class PayloadResolver {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	@SuppressWarnings("unchecked")
 	public void add(final PayloadDecoder decoder, final byte[] data, final Object fullMessage) {
 		Ensure.notNull(decoder, "PayloadDecoder is null");
 		Ensure.notNull(fullMessage, "fullMessage is null");
