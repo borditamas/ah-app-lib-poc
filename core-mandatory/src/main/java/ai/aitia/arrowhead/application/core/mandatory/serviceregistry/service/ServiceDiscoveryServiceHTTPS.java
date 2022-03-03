@@ -7,7 +7,9 @@ import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.networking.PayloadResolver;
+import ai.aitia.arrowhead.application.common.networking.decoder.MediaType;
+import ai.aitia.arrowhead.application.common.networking.decoder.PayloadResolver;
+import ai.aitia.arrowhead.application.common.networking.decoder.exception.PayloadDecodingException;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.MessageProperties;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
@@ -118,9 +120,14 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	@Override
 	public ServiceModel register(final ServiceModel service) throws CommunicationException {
 		this.registerHttpsClient.send(new RegisterServiceRequestJSON(service));
-		final PayloadResolver resolver = new PayloadResolver();
+		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.registerHttpsClient.receive(resolver);
-		return resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
+		try {
+			return resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
+			
+		} catch (final PayloadDecodingException ex) {
+			throw new CommunicationException("Payload cannot be decoded", ex);
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -132,7 +139,7 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		final MessageProperties msgProps = new MessageProperties();
 		msgProps.add(HttpsMsgKey.QUERY_PARAMETERS, queryParams);
 		this.unregisterHttpsClient.send(msgProps, null);		
-		this.unregisterHttpsClient.receive(new PayloadResolver());
+		this.unregisterHttpsClient.receive(new PayloadResolver(MediaType.EMPTY));
 		return true;
 	}
 
@@ -140,8 +147,12 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	@Override
 	public List<ServiceModel> query(final ServiceQueryModel form) throws CommunicationException {
 		this.queryHttpsClient.send(new ServiceQueryRequestJSON(form));
-		final PayloadResolver resolver = new PayloadResolver();
+		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.queryHttpsClient.receive(resolver);
-		return resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
+		try {
+			return resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
+		} catch (final PayloadDecodingException ex) {
+			throw new CommunicationException("Payload cannot be decoded", ex);
+		}
 	}
 }

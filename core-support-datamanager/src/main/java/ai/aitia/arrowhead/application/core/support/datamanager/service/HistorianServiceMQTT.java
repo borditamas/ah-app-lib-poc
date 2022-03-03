@@ -6,7 +6,9 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.networking.PayloadResolver;
+import ai.aitia.arrowhead.application.common.networking.decoder.MediaType;
+import ai.aitia.arrowhead.application.common.networking.decoder.PayloadResolver;
+import ai.aitia.arrowhead.application.common.networking.decoder.exception.PayloadDecodingException;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.MessageProperties;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
@@ -96,14 +98,19 @@ public class HistorianServiceMQTT implements HistorianService  {
 			this.getDataSubscribed = true;
 		}
 		
-		final PayloadResolver resolver = new PayloadResolver();
+		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.getDataMQTTClient.receive(resolver);
 		
 		if (terminate) {
 			this.getDataMQTTClient.terminate();
 			this.getDataSubscribed = false;
 		}
-		return resolver.getPayload(List.class);
+
+		try {
+			return resolver.getPayload(List.class);
+		} catch (final PayloadDecodingException ex) {
+			throw new CommunicationException("Payload cannot be decoded", ex);
+		}
 	}
 	
 	//-------------------------------------------------------------------------------------------------

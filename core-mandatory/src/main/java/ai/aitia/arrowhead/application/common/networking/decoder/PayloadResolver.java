@@ -1,11 +1,14 @@
-package ai.aitia.arrowhead.application.common.networking;
+package ai.aitia.arrowhead.application.common.networking.decoder;
 
+import ai.aitia.arrowhead.application.common.networking.decoder.exception.PayloadDecodingException;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 
 public class PayloadResolver {
 	
 	//=================================================================================================
 	// members
+	
+	private final MediaType media;
 		
 	private PayloadDecoder decoder;
 	private String payloadStr;
@@ -16,19 +19,29 @@ public class PayloadResolver {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public <P>P getPayload(Class<P> type) {
+	public PayloadResolver(final MediaType media) {
+		Ensure.notNull(media, "MediaType is null");
+		this.media = media;
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	public <P>P getPayload(final Class<P> type) throws PayloadDecodingException {
+		if (this.media == MediaType.EMPTY) {
+			return null;
+		}
+		
 		try {
 			if (this.payloadStr != null && !this.payloadStr.isBlank()) {
-				return this.decoder.decode(this.payloadStr, type);
+				return this.decoder.decode(this.media, this.payloadStr, type);
 			}
 			if (this.payloadBytes != null && this.payloadBytes.length != 0) {
-				return this.decoder.decode(this.payloadBytes, type);
+				return this.decoder.decode(this.media, this.payloadBytes, type);
 			}
 			
 		} catch (final Exception ex) {
-			Ensure.fail("Payload cannot be decoded as " + type.getSimpleName()+ ". " + ex.getMessage());
+			throw new PayloadDecodingException("Payload cannot be decoded as " + type.getSimpleName(), ex);
 		}
-		return null;
+		throw new PayloadDecodingException("No data to decode");
 	}
 	
 	//-------------------------------------------------------------------------------------------------

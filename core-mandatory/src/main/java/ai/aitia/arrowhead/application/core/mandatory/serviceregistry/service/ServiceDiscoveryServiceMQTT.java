@@ -7,7 +7,9 @@ import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
-import ai.aitia.arrowhead.application.common.networking.PayloadResolver;
+import ai.aitia.arrowhead.application.common.networking.decoder.MediaType;
+import ai.aitia.arrowhead.application.common.networking.decoder.PayloadResolver;
+import ai.aitia.arrowhead.application.common.networking.decoder.exception.PayloadDecodingException;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.MessageProperties;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
@@ -118,11 +120,17 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		props.add(MqttMsgKey.RECEIVE_TIMEOUT, true);
 		
 		this.registerMqttClient.send(props, new RegisterServiceRequestJSON(service));
-		final PayloadResolver resolver = new PayloadResolver();
+		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.registerMqttClient.receive(resolver);
-		final ServiceModel response = resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
-		this.registerMqttClient.terminate();
-		return response;
+		
+		try {
+			final ServiceModel response = resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
+			this.registerMqttClient.terminate();
+			return response;
+			
+		} catch (final PayloadDecodingException ex) {
+			throw new CommunicationException("Payload cannot be decoded", ex);
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------------	
@@ -135,11 +143,17 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		props.add(MqttMsgKey.RECEIVE_TIMEOUT, true);
 		
 		this.unregisterMqttClient.send(props, service.getName());
-		final PayloadResolver resolver = new PayloadResolver();
+		final PayloadResolver resolver = new PayloadResolver(MediaType.TEXT);
 		this.unregisterMqttClient.receive(resolver);
-		final boolean response = resolver.getPayload(Boolean.class);
-		this.unregisterMqttClient.terminate();
-		return response;
+		
+		try {
+			final boolean response = resolver.getPayload(Boolean.class);
+			this.unregisterMqttClient.terminate();
+			return response;
+			
+		} catch (final PayloadDecodingException ex) {
+			throw new CommunicationException("Payload cannot be decoded", ex);
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------------	
@@ -152,10 +166,16 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		props.add(MqttMsgKey.RECEIVE_TIMEOUT, true);
 		
 		this.queryMqttClient.send(new ServiceQueryRequestJSON(from));
-		final PayloadResolver resolver = new PayloadResolver();
+		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.queryMqttClient.receive(resolver);
-		final List<ServiceModel> response = resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
-		this.queryMqttClient.terminate();
-		return response;
+		
+		try {
+			final List<ServiceModel> response = resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
+			this.queryMqttClient.terminate();
+			return response;
+			
+		} catch (final PayloadDecodingException ex) {
+			throw new CommunicationException("Payload cannot be decoded", ex);
+		}
 	}
 }

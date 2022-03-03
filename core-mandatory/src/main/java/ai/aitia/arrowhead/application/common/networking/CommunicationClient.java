@@ -1,6 +1,7 @@
 package ai.aitia.arrowhead.application.common.networking;
 
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
+import ai.aitia.arrowhead.application.common.networking.decoder.PayloadResolver;
 import ai.aitia.arrowhead.application.common.networking.profile.MessageProperties;
 
 public interface CommunicationClient {
