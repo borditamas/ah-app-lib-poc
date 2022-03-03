@@ -11,7 +11,7 @@ import ai.aitia.arrowhead.application.common.networking.profile.CommunicationPro
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
-import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.ServiceRegistryClient;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryService;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
 
 public class SystemRegistryClient extends AbstractCoreClient {
@@ -19,7 +19,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	//=================================================================================================
 	// members
 	
-	private final ServiceRegistryClient srClient;
+	private final ServiceDiscoveryService discovery;
 	
 	private MonitoringService monitoringService;
 	
@@ -27,19 +27,19 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public SystemRegistryClient(final CommunicationProfile communicationProfile, final ServiceRegistryClient srClient) {
+	public SystemRegistryClient(final CommunicationProfile communicationProfile, final ServiceDiscoveryService discovery) {
 		super(communicationProfile);
-		this.srClient = srClient;
+		this.discovery = discovery;
 		
-		Ensure.notNull(super.communicationProfile, "communicationProfile is null.");
-		Ensure.notNull(this.srClient, "srClient is null.");
+		Ensure.notNull(super.communicationProfile, "CommunicationProfile is null.");
+		Ensure.notNull(this.discovery, "ServiceDiscoveryService is null.");
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void initialize() {
 		try {
-			this.srClient.verifyInitialization();
+			this.discovery.verify();
 			initializeServices();
 			// TODO: info log
 			
@@ -96,7 +96,7 @@ public class SystemRegistryClient extends AbstractCoreClient {
 	private MonitoringServiceHTTPS createMonitoringService(final MonitoringServiceHTTPS monitoring) {		
 		List<ServiceModel> services;
 		try {
-			services = srClient.serviceDiscoveryService().query(monitoring.getServiceQueryForm());
+			services = this.discovery.query(monitoring.getServiceQueryForm());
 		} catch (final InitializationException ex) {
 			throw new InitializationException("Service Registry is not initialized.");
 			

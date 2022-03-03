@@ -11,7 +11,7 @@ import ai.aitia.arrowhead.application.common.networking.profile.CommunicationPro
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
-import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.ServiceRegistryClient;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryService;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.core.support.datamanager.service.HistorianService;
 import ai.aitia.arrowhead.application.core.support.datamanager.service.HistorianServiceHTTPS;
@@ -22,7 +22,7 @@ public class DatamanagerClient extends AbstractCoreClient {
 	//=================================================================================================
 	// members
 	
-	private final ServiceRegistryClient srClient;
+	private final ServiceDiscoveryService discovery;
 	
 	private MonitoringService monitoringService;
 	private HistorianService historianService;
@@ -31,19 +31,19 @@ public class DatamanagerClient extends AbstractCoreClient {
 	// methods
 	
 	//-------------------------------------------------------------------------------------------------
-	public DatamanagerClient(final CommunicationProfile communicationProfile, final ServiceRegistryClient srClient) {
+	public DatamanagerClient(final CommunicationProfile communicationProfile, final ServiceDiscoveryService discovery) {
 		super(communicationProfile);
-		this.srClient = srClient;
+		this.discovery = discovery;
 		
-		Ensure.notNull(super.communicationProfile, "communicationProfile is null.");
-		Ensure.notNull(this.srClient, "srClient is null.");
+		Ensure.notNull(super.communicationProfile, "CommunicationProfile is null.");
+		Ensure.notNull(this.discovery, "ServiceDiscoveryService is null.");
 	}
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
 	public void initialize() {
 		try {
-			this.srClient.verifyInitialization();
+			this.discovery.verify();
 			initializeServices();
 			// TODO: info log
 			
@@ -122,7 +122,7 @@ public class DatamanagerClient extends AbstractCoreClient {
 	private MonitoringServiceHTTPS createMonitoringService(final MonitoringServiceHTTPS monitoring) {		
 		List<ServiceModel> services;
 		try {
-			services = srClient.serviceDiscoveryService().query(monitoring.getServiceQueryForm());
+			services = this.discovery.query(monitoring.getServiceQueryForm());
 		} catch (final InitializationException ex) {
 			throw new InitializationException("Service Registry is not initialized.");
 			
@@ -145,7 +145,7 @@ public class DatamanagerClient extends AbstractCoreClient {
 	private HistorianService createHistorianService(final HistorianService historian)  {
 		List<ServiceModel> services;
 		try {
-			services = srClient.serviceDiscoveryService().query(historian.getServiceQueryForm());
+			services = this.discovery.query(historian.getServiceQueryForm());
 		} catch (final InitializationException ex) {
 			throw new InitializationException("Service Registry is not initialized.");
 			
