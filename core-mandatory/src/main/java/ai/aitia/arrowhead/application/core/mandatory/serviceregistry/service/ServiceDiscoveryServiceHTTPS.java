@@ -118,9 +118,9 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	@Override
 	public ServiceModel register(final ServiceModel service) throws CommunicationException {
 		this.registerHttpsClient.send(new RegisterServiceRequestJSON(service));
-		final PayloadResolver<RegisterServiceResponseJSON> resolver = new PayloadResolver<>();
+		final PayloadResolver resolver = new PayloadResolver();
 		this.registerHttpsClient.receive(resolver);
-		return resolver.getPayload().convertToServiceModel();
+		return resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -132,7 +132,7 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		final MessageProperties msgProps = new MessageProperties();
 		msgProps.add(HttpsMsgKey.QUERY_PARAMETERS, queryParams);
 		this.unregisterHttpsClient.send(msgProps, null);		
-		this.unregisterHttpsClient.receive(null);
+		this.unregisterHttpsClient.receive(new PayloadResolver());
 		return true;
 	}
 
@@ -140,8 +140,8 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	@Override
 	public List<ServiceModel> query(final ServiceQueryModel form) throws CommunicationException {
 		this.queryHttpsClient.send(new ServiceQueryRequestJSON(form));
-		final PayloadResolver<ServiceQueryResponseJSON> resolver = new PayloadResolver<>();
+		final PayloadResolver resolver = new PayloadResolver();
 		this.queryHttpsClient.receive(resolver);
-		return resolver.getPayload().convertToServiceModelList();
+		return resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
 	}
 }

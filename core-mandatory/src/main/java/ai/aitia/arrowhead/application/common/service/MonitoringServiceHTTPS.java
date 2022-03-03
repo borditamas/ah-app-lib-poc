@@ -4,6 +4,7 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.networking.CommunicationClient;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
+import ai.aitia.arrowhead.application.common.networking.PayloadResolver;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
@@ -83,8 +84,9 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	public boolean echo() {
 		try {
 			this.echoHttpsClient.send(null);
-			this.echoHttpsClient.receive(null); // Later it will contain some data
+			this.echoHttpsClient.receive(new PayloadResolver()); // Later it will contain some data
 			return true;
+			
 		} catch (final CommunicationException ex) {
 			return false;
 		}

@@ -96,14 +96,14 @@ public class HistorianServiceMQTT implements HistorianService  {
 			this.getDataSubscribed = true;
 		}
 		
-		final PayloadResolver<List<String>> resolver = new PayloadResolver<>();
+		final PayloadResolver resolver = new PayloadResolver();
 		this.getDataMQTTClient.receive(resolver);
 		
 		if (terminate) {
 			this.getDataMQTTClient.terminate();
 			this.getDataSubscribed = false;
 		}
-		return resolver.getPayload();
+		return resolver.getPayload(List.class);
 	}
 	
 	//-------------------------------------------------------------------------------------------------

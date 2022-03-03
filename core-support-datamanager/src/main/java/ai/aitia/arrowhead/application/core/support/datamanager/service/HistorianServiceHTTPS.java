@@ -100,13 +100,13 @@ public class HistorianServiceHTTPS implements HistorianService {
 		props.add(WebsocketMsgKey.PATH_VARIABLES, new PathVariables(List.of(systemName, serviceName)));
 		this.putDataWSClient.send(props);
 		
-		final PayloadResolver<List<String>> resolver = new PayloadResolver<>();
+		final PayloadResolver resolver = new PayloadResolver();
 		this.getDataWSClient.receive(resolver);
 		
 		if (terminate) {
 			this.getDataWSClient.terminate();
 		}
-		return null;
+		return resolver.getPayload(List.class);
 	}
 
 	//-------------------------------------------------------------------------------------------------

@@ -101,14 +101,14 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 			this.getDataConnected = true;
 		}
 		
-		final PayloadResolver<List<String>> resolver = new PayloadResolver<>();
+		final PayloadResolver resolver = new PayloadResolver();
 		this.getDataWSClient.receive(resolver);
 		
 		if (terminate) {
 			this.getDataWSClient.terminate();
 			this.getDataConnected = false;
 		}
-		return resolver.getPayload();
+		return resolver.getPayload(List.class);
 	}
 	
 	//-------------------------------------------------------------------------------------------------
