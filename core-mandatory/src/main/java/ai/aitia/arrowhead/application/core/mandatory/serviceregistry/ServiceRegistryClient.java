@@ -6,7 +6,6 @@ import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
-import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
 import ai.aitia.arrowhead.application.common.networking.profile.CommunicationProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
@@ -14,6 +13,7 @@ import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryService;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryServiceHTTPS;
+import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.ServiceDiscoveryServiceMQTT;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
 
 public class ServiceRegistryClient extends AbstractCoreClient {
@@ -100,7 +100,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 					this.serviceDiscoveryService = createServiceDiscoveryService(new ServiceDiscoveryServiceHTTPS(communicator, this.queryInterfaceProfile));
 					break;
 				case MQTT:
-					//this.historianService = createHistorianService(new HistorianServiceWEBSOCKET(communicator));
+					this.serviceDiscoveryService = createServiceDiscoveryService(new ServiceDiscoveryServiceMQTT(communicator, this.queryInterfaceProfile));
 					break;
 				default:
 					throw new InitializationException("Communicator type not supported");
@@ -110,14 +110,23 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 		
 		if (super.communicationProfile.contains(MonitoringService.NAME)) {
 			final Communicator communicator = super.communicationProfile.communicator(MonitoringService.NAME);
-			if (communicator != null && communicator.type() == CommunicatorType.HTTPS) {
-				this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(communicator));
+			if (communicator != null) {
+				switch (communicator.type()) {
+				case HTTPS:
+					this.monitoringService = createMonitoringService(new MonitoringServiceHTTPS(communicator));
+					break;
+				case MQTT:
+					//this.monitoringService = createMonitoringService(new MonitoringServiceMQTT(communicator));
+					break;
+				default:
+					throw new InitializationException("Communicator type not supported");
+				}
 			}			
 		}
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private ServiceDiscoveryServiceHTTPS createServiceDiscoveryService(final ServiceDiscoveryServiceHTTPS serviceDiscovery) {
+	private ServiceDiscoveryService createServiceDiscoveryService(final ServiceDiscoveryService serviceDiscovery) {
 		List<ServiceModel> services;
 		try {
 			services = serviceDiscoveryService.query(serviceDiscovery.getServiceQueryForm());
@@ -137,7 +146,7 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 	}
 	
 	//-------------------------------------------------------------------------------------------------
-	private MonitoringServiceHTTPS createMonitoringService(final MonitoringServiceHTTPS monitoring) {
+	private MonitoringService createMonitoringService(final MonitoringService monitoring) {
 		List<ServiceModel> services;
 		try {
 			services = serviceDiscoveryService.query(monitoring.getServiceQueryForm());
