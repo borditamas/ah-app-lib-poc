@@ -14,6 +14,7 @@ import ai.aitia.arrowhead.application.common.networking.profile.MessagePropertie
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
 import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsMsgKey;
 import ai.aitia.arrowhead.application.common.networking.profile.model.PathVariables;
 import ai.aitia.arrowhead.application.common.networking.profile.websocket.WebsocketKey;
 import ai.aitia.arrowhead.application.common.networking.profile.websocket.WebsocketMsgKey;
@@ -30,10 +31,10 @@ public class HistorianServiceHTTPS implements HistorianService {
 	private Communicator communicator;	
 	
 	private final String getDataOperation = "get-data";
-	private CommunicationClient getDataWSClient;
+	private CommunicationClient getDataHTTPClient;
 	
 	private final String putDataOperation = "put-data";
-	private CommunicationClient putDataWSClient;
+	private CommunicationClient putDataHTTPClient;
 	
 	//=================================================================================================
 	// methods
@@ -76,14 +77,14 @@ public class HistorianServiceHTTPS implements HistorianService {
 				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.ADDRESS), "get-data operation address is empty");
 				Ensure.portRange(interfaceProfile.get(Integer.class, HttpsKey.PORT));
 				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.PATH), "no path for get-data operation");
-				this.getDataWSClient = communicator.client(interfaceProfile);
+				this.getDataHTTPClient = communicator.client(interfaceProfile);
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.putDataOperation)) {
 				Ensure.notNull(interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD), "no method for put-data operation");
 				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.ADDRESS), "put-data operation address is empty");
 				Ensure.portRange(interfaceProfile.get(Integer.class, HttpsKey.PORT));
 				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.PATH), "no path for put-data operation");
-				this.putDataWSClient = communicator.client(interfaceProfile);
+				this.putDataHTTPClient = communicator.client(interfaceProfile);
 			}
 		}
 	}
@@ -99,14 +100,14 @@ public class HistorianServiceHTTPS implements HistorianService {
 	@Override
 	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException {
 		final MessageProperties props = new MessageProperties();
-		props.add(WebsocketMsgKey.PATH_VARIABLES, new PathVariables(List.of(systemName, serviceName)));
-		this.putDataWSClient.send(props);
+		props.add(HttpsMsgKey.PATH_VARIABLES, new PathVariables(List.of(systemName, serviceName)));
+		this.putDataHTTPClient.send(props);
 		
 		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
-		this.getDataWSClient.receive(resolver);
+		this.getDataHTTPClient.receive(resolver);
 		
 		if (terminate) {
-			this.getDataWSClient.terminate();
+			this.getDataHTTPClient.terminate(); //TODO should be called before or after send?
 		}
 		
 		try {
@@ -120,10 +121,11 @@ public class HistorianServiceHTTPS implements HistorianService {
 	@Override
 	public void putData(final String systemName, final String serviceName, final List<String> senML, final boolean terminate) throws CommunicationException {
 		final MessageProperties props = new MessageProperties();
-		props.add(WebsocketMsgKey.PATH_VARIABLES, new PathVariables(List.of(systemName, serviceName)));
-		this.putDataWSClient.send(props, senML);
+		props.add(HttpsMsgKey.PATH_VARIABLES, new PathVariables(List.of(systemName, serviceName)));
+		this.putDataHTTPClient.send(props, senML);
 		if (terminate) {
-			this.putDataWSClient.terminate();
+			this.putDataHTTPClient.terminate(); //TODO should be called before or after send?
 		}
+		this.putDataHTTPClient.receive(new PayloadResolver(MediaType.EMPTY));
 	}
 }

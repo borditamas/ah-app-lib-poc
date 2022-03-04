@@ -158,8 +158,6 @@ public class DatamanagerClient extends AbstractCoreClient {
 		List<ServiceModel> services;
 		try {
 			services = this.discovery.query(historian.getServiceQueryForm());
-		} catch (final InitializationException ex) {
-			throw new InitializationException("Service Registry is not initialized.");
 			
 		} catch (final CommunicationException ex) {
 			throw new InitializationException("CommunicationException occured while querying " + historian.getServiceName() + " service", ex);

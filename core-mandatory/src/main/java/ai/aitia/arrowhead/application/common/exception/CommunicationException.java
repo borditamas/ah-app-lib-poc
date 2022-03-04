@@ -4,11 +4,11 @@ public class CommunicationException extends Exception {
 
 	private static final long serialVersionUID = -22868013731893292L;
 
-	public CommunicationException(String message) {
+	public CommunicationException(final String message) {
 		super(message);
 	}
 
-	public CommunicationException(String message, Throwable cause) {
+	public CommunicationException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 }

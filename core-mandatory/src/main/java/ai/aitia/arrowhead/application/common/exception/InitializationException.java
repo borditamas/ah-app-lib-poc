@@ -8,7 +8,7 @@ public class InitializationException extends RuntimeException {
 		super(message);
 	}
 
-	public InitializationException(String message, Throwable cause) {
+	public InitializationException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 }

@@ -25,7 +25,7 @@ public class PayloadResolver {
 	}
 
 	//-------------------------------------------------------------------------------------------------
-	public <P>P getPayload(final Class<P> type) throws PayloadDecodingException {
+	public <P> P getPayload(final Class<P> type) throws PayloadDecodingException {
 		if (this.media == MediaType.EMPTY) {
 			return null;
 		}
@@ -53,6 +53,7 @@ public class PayloadResolver {
 	
 	//-------------------------------------------------------------------------------------------------
 	public void add(final PayloadDecoder decoder, final String data, final Object fullMessage) {
+		// TODO throw ex when already has value --> final!
 		Ensure.notNull(decoder, "PayloadDecoder is null");
 		Ensure.notNull(fullMessage, "fullMessage is null");
 		this.decoder = decoder;
@@ -62,8 +63,9 @@ public class PayloadResolver {
 	
 	//-------------------------------------------------------------------------------------------------
 	public void add(final PayloadDecoder decoder, final byte[] data, final Object fullMessage) {
+		// TODO throw ex when already has value --> final!
 		Ensure.notNull(decoder, "PayloadDecoder is null");
-		Ensure.notNull(fullMessage, "fullMessage is null");
+		Ensure.notNull(fullMessage, "fullMessage is null");		
 		this.decoder = decoder;
 		this.payloadBytes = data;
 		this.fullMessage = fullMessage;
@@ -71,6 +73,7 @@ public class PayloadResolver {
 	
 	//-------------------------------------------------------------------------------------------------
 	public void add(final Object fullMessage) {
+		// TODO throw ex when already has value --> final!
 		Ensure.notNull(fullMessage, "fullMessage is null");
 		this.fullMessage = fullMessage;
 	}

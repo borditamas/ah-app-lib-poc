@@ -90,7 +90,7 @@ public class HistorianServiceMQTT implements HistorianService  {
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException {
+	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException { // TODO return an object where all info is conatined (decoding error flag, etc...)
 		if (!this.getDataSubscribed) {
 			final MessageProperties props = new MessageProperties();
 			props.add(MqttMsgKey.PATH_VARIABLES_SUBSCRIBE, new PathVariables(List.of(systemName, serviceName)));
@@ -115,9 +115,9 @@ public class HistorianServiceMQTT implements HistorianService  {
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public void putData(final String systemName, final String serviceName, final List<String> senML, final boolean terminate) throws CommunicationException {
+	public void putData(final String systemName, final String serviceName, final List<String> senML, final boolean terminate) throws CommunicationException { // TODO return an object where all info is conatined (decoding error flag, etc...)
 		final MessageProperties props = new MessageProperties();
-		props.add(MqttMsgKey.PATH_VARIABLES_PUBLISH, new PathVariables(List.of(systemName, serviceName)));
+		props.add(MqttMsgKey.PATH_VARIABLES_PUBLISH, new PathVariables(List.of(systemName, serviceName))); // TODO it should be a general topic for sending data 
 		this.putDataMQTTClient.send(props, senML);
 		// 'terminate' is intentionally ignored
 	}
