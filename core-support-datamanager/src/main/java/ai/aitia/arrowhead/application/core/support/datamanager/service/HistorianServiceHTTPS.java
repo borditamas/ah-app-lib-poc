@@ -18,6 +18,7 @@ import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.OperationModel;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceQueryModel;
+import ai.aitia.arrowhead.application.core.support.datamanager.service.model.SenML;
 
 public class HistorianServiceHTTPS implements HistorianService {
 
@@ -88,7 +89,7 @@ public class HistorianServiceHTTPS implements HistorianService {
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException, PayloadDecodingException {
+	public SenML getMeasurements(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException, PayloadDecodingException {
 		final MessageProperties props = new MessageProperties();
 		props.add(HttpsMsgKey.PATH_VARIABLES, new PathVariables(List.of(systemName, serviceName)));
 		this.putDataHTTPClient.send(props);
@@ -103,15 +104,15 @@ public class HistorianServiceHTTPS implements HistorianService {
 		if (resolver.isClientError()) {
 			throw new CommunicationException(resolver.getClientErrorMsg());
 		}
-		return resolver.getPayload(List.class);
+		return resolver.getPayload(SenML.class);
 	}
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public void putData(final String systemName, final String serviceName, final List<String> senML, final boolean terminate) throws CommunicationException {
+	public void putMeasurements(final String systemName, final String serviceName, final List<SenML> measurements, final boolean terminate) throws CommunicationException {
 		final MessageProperties props = new MessageProperties();
 		props.add(HttpsMsgKey.PATH_VARIABLES, new PathVariables(List.of(systemName, serviceName)));
-		this.putDataHTTPClient.send(props, senML);
+		this.putDataHTTPClient.send(props, measurements);
 		if (terminate) {
 			this.putDataHTTPClient.terminate(); //TODO should be called before or after send?
 		}

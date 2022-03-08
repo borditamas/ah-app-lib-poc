@@ -18,6 +18,7 @@ import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.OperationModel;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceQueryModel;
+import ai.aitia.arrowhead.application.core.support.datamanager.service.model.SenML;
 
 public class HistorianServiceMQTT implements HistorianService  {
 
@@ -89,7 +90,7 @@ public class HistorianServiceMQTT implements HistorianService  {
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException, PayloadDecodingException { // TODO return an object where all info is conatined (decoding error flag, etc...)
+	public SenML getMeasurements(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException, PayloadDecodingException { // TODO return an object where all info is conatined (decoding error flag, etc...)
 		if (!this.getDataSubscribed) {
 			final MessageProperties props = new MessageProperties();
 			props.add(MqttMsgKey.PATH_VARIABLES_SUBSCRIBE, new PathVariables(List.of(systemName, serviceName)));
@@ -108,15 +109,15 @@ public class HistorianServiceMQTT implements HistorianService  {
 		if (resolver.isClientError()) {
 			throw new CommunicationException(resolver.getClientErrorMsg());
 		}
-		return resolver.getPayload(List.class);
+		return resolver.getPayload(SenML.class);
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public void putData(final String systemName, final String serviceName, final List<String> senML, final boolean terminate) throws CommunicationException { // TODO return an object where all info is conatined (decoding error flag, etc...)
+	public void putMeasurements(final String systemName, final String serviceName, final List<SenML> measurements, final boolean terminate) throws CommunicationException { // TODO return an object where all info is conatined (decoding error flag, etc...)
 		final MessageProperties props = new MessageProperties();
 		props.add(MqttMsgKey.PATH_VARIABLES_PUBLISH, new PathVariables(List.of(systemName, serviceName))); // TODO it should be a general topic for sending data 
-		this.putDataMQTTClient.send(props, senML);
+		this.putDataMQTTClient.send(props, measurements);
 		// 'terminate' is intentionally ignored
 	}
 }
