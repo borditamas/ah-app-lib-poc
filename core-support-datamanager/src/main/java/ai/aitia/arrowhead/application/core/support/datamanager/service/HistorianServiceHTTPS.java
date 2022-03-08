@@ -88,7 +88,7 @@ public class HistorianServiceHTTPS implements HistorianService {
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException {
+	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException, PayloadDecodingException {
 		final MessageProperties props = new MessageProperties();
 		props.add(HttpsMsgKey.PATH_VARIABLES, new PathVariables(List.of(systemName, serviceName)));
 		this.putDataHTTPClient.send(props);
@@ -100,11 +100,7 @@ public class HistorianServiceHTTPS implements HistorianService {
 			this.getDataHTTPClient.terminate(); //TODO should be called before or after send?
 		}
 		
-		try {
-			return resolver.getPayload(List.class);
-		} catch (final PayloadDecodingException ex) {
-			throw new CommunicationException("Payload cannot be decoded", ex);
-		}
+		return resolver.getPayload(List.class);
 	}
 
 	//-------------------------------------------------------------------------------------------------

@@ -110,7 +110,7 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 
 	//-------------------------------------------------------------------------------------------------	
 	@Override
-	public ServiceModel register(final ServiceModel service) throws CommunicationException {
+	public ServiceModel register(final ServiceModel service) throws CommunicationException, PayloadDecodingException {
 		final PathVariables subscribePathVars = new PathVariables();
 		subscribePathVars.add(service.getName());
 		final MessageProperties props = new MessageProperties();
@@ -121,14 +121,9 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.registerMqttClient.receive(resolver);
 		
-		try {
-			final ServiceModel response = resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
-			this.registerMqttClient.terminate();
-			return response;
-			
-		} catch (final PayloadDecodingException ex) {
-			throw new CommunicationException("Payload cannot be decoded", ex);
-		}
+		final ServiceModel response = resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
+		this.registerMqttClient.terminate();
+		return response;
 	}
 
 	//-------------------------------------------------------------------------------------------------	
@@ -156,7 +151,7 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 
 	//-------------------------------------------------------------------------------------------------	
 	@Override
-	public List<ServiceModel> query(final ServiceQueryModel from) throws CommunicationException {
+	public List<ServiceModel> query(final ServiceQueryModel from) throws CommunicationException, PayloadDecodingException {
 		final PathVariables subscribePathVars = new PathVariables();
 		//subscribePathVars.add(service.getRequesterSystemName());
 		final MessageProperties props = new MessageProperties();
@@ -167,13 +162,8 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.queryMqttClient.receive(resolver);
 		
-		try {
-			final List<ServiceModel> response = resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
-			this.queryMqttClient.terminate();
-			return response;
-			
-		} catch (final PayloadDecodingException ex) {
-			throw new CommunicationException("Payload cannot be decoded", ex);
-		}
+		final List<ServiceModel> response = resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
+		this.queryMqttClient.terminate();
+		return response;
 	}
 }

@@ -6,6 +6,7 @@ import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
+import ai.aitia.arrowhead.application.common.networking.decoder.exception.PayloadDecodingException;
 import ai.aitia.arrowhead.application.common.networking.profile.CommunicationProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
@@ -135,6 +136,10 @@ public class DatamanagerClient extends AbstractCoreClient {
 		List<ServiceModel> services;
 		try {
 			services = this.discovery.query(monitoring.getServiceQueryForm());
+			
+		} catch (final PayloadDecodingException ex) {
+			throw new InitializationException("SerciveModel failure", ex);
+			
 		} catch (final InitializationException ex) {
 			throw new InitializationException("Service Registry is not initialized.");
 			
@@ -158,6 +163,9 @@ public class DatamanagerClient extends AbstractCoreClient {
 		List<ServiceModel> services;
 		try {
 			services = this.discovery.query(historian.getServiceQueryForm());
+			
+		} catch (final PayloadDecodingException ex) {
+			throw new InitializationException("SerciveModel failure", ex);
 			
 		} catch (final CommunicationException ex) {
 			throw new InitializationException("CommunicationException occured while querying " + historian.getServiceName() + " service", ex);

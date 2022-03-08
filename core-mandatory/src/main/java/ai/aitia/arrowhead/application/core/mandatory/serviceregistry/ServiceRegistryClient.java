@@ -6,6 +6,7 @@ import ai.aitia.arrowhead.application.common.core.AbstractCoreClient;
 import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
+import ai.aitia.arrowhead.application.common.networking.decoder.exception.PayloadDecodingException;
 import ai.aitia.arrowhead.application.common.networking.profile.CommunicationProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
@@ -130,6 +131,9 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 		List<ServiceModel> services;
 		try {
 			services = serviceDiscoveryService.query(serviceDiscovery.getServiceQueryForm());
+		
+		} catch (final PayloadDecodingException ex) {
+			throw new InitializationException("SerciveModel failure", ex);
 			
 		} catch (final CommunicationException ex) {
 			throw new InitializationException("CommunicationException occured while querying " + serviceDiscovery.getServiceName() + " service", ex);
@@ -150,6 +154,10 @@ public class ServiceRegistryClient extends AbstractCoreClient {
 		List<ServiceModel> services;
 		try {
 			services = serviceDiscoveryService.query(monitoring.getServiceQueryForm());
+			
+		} catch (final PayloadDecodingException ex) {
+			throw new InitializationException("SerciveModel failure", ex);
+			
 		} catch (final CommunicationException e) {
 			throw new InitializationException("CommunicationException occured while querying " + monitoring.getServiceName() + " service");
 		}

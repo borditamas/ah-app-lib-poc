@@ -95,7 +95,7 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException {
+	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException, PayloadDecodingException {
 		if (!this.getDataConnected) {
 			final MessageProperties props = new MessageProperties();
 			props.add(WebsocketMsgKey.PATH_VARIABLES, new PathVariables(List.of(systemName, serviceName)));
@@ -111,11 +111,7 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 			this.getDataConnected = false;
 		}
 		
-		try {
-			return resolver.getPayload(List.class);
-		} catch (final PayloadDecodingException ex) {
-			throw new CommunicationException("Payload cannot be decoded", ex);
-		}
+		return resolver.getPayload(List.class);
 	}
 	
 	//-------------------------------------------------------------------------------------------------

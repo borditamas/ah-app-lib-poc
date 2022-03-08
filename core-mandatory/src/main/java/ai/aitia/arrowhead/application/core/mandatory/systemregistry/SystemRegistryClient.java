@@ -7,6 +7,7 @@ import ai.aitia.arrowhead.application.common.exception.CommunicationException;
 import ai.aitia.arrowhead.application.common.exception.InitializationException;
 import ai.aitia.arrowhead.application.common.networking.Communicator;
 import ai.aitia.arrowhead.application.common.networking.CommunicatorType;
+import ai.aitia.arrowhead.application.common.networking.decoder.exception.PayloadDecodingException;
 import ai.aitia.arrowhead.application.common.networking.profile.CommunicationProfile;
 import ai.aitia.arrowhead.application.common.service.MonitoringService;
 import ai.aitia.arrowhead.application.common.service.MonitoringServiceHTTPS;
@@ -97,8 +98,8 @@ public class SystemRegistryClient extends AbstractCoreClient {
 		List<ServiceModel> services;
 		try {
 			services = this.discovery.query(monitoring.getServiceQueryForm());
-		} catch (final InitializationException ex) {
-			throw new InitializationException("Service Registry is not initialized.");
+		} catch (final PayloadDecodingException ex) {
+			throw new InitializationException("SerciveModel failure", ex);
 			
 		} catch (final CommunicationException ex) {
 			throw new InitializationException("CommunicationException occured while querying " + monitoring.getServiceName() + " service", ex);

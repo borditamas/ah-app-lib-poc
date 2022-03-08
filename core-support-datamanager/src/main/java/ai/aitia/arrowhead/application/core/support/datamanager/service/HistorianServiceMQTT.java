@@ -89,7 +89,7 @@ public class HistorianServiceMQTT implements HistorianService  {
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException { // TODO return an object where all info is conatined (decoding error flag, etc...)
+	public List<String> getData(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException, PayloadDecodingException { // TODO return an object where all info is conatined (decoding error flag, etc...)
 		if (!this.getDataSubscribed) {
 			final MessageProperties props = new MessageProperties();
 			props.add(MqttMsgKey.PATH_VARIABLES_SUBSCRIBE, new PathVariables(List.of(systemName, serviceName)));
@@ -105,11 +105,7 @@ public class HistorianServiceMQTT implements HistorianService  {
 			this.getDataSubscribed = false;
 		}
 
-		try {
-			return resolver.getPayload(List.class);
-		} catch (final PayloadDecodingException ex) {
-			throw new CommunicationException("Payload cannot be decoded", ex);
-		}
+		return resolver.getPayload(List.class);
 	}
 	
 	//-------------------------------------------------------------------------------------------------

@@ -116,16 +116,11 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 	
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public ServiceModel register(final ServiceModel service) throws CommunicationException {
+	public ServiceModel register(final ServiceModel service) throws CommunicationException, PayloadDecodingException {
 		this.registerHttpsClient.send(new RegisterServiceRequestJSON(service));
 		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.registerHttpsClient.receive(resolver);
-		try {
-			return resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
-			
-		} catch (final PayloadDecodingException ex) {
-			throw new CommunicationException("Payload cannot be decoded", ex);
-		}
+		return resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
 	}
 
 	//-------------------------------------------------------------------------------------------------
@@ -143,14 +138,10 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public List<ServiceModel> query(final ServiceQueryModel form) throws CommunicationException {
+	public List<ServiceModel> query(final ServiceQueryModel form) throws CommunicationException, PayloadDecodingException {
 		this.queryHttpsClient.send(new ServiceQueryRequestJSON(form));
 		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.queryHttpsClient.receive(resolver);
-		try {
-			return resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
-		} catch (final PayloadDecodingException ex) {
-			throw new CommunicationException("Payload cannot be decoded", ex);
-		}
+		return resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
 	}
 }
