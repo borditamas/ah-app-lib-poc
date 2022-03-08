@@ -12,12 +12,8 @@ import ai.aitia.arrowhead.application.common.networking.decoder.exception.Payloa
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.MessageProperties;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
-import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
-import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
 import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsMsgKey;
 import ai.aitia.arrowhead.application.common.networking.profile.model.PathVariables;
-import ai.aitia.arrowhead.application.common.networking.profile.websocket.WebsocketKey;
-import ai.aitia.arrowhead.application.common.networking.profile.websocket.WebsocketMsgKey;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.OperationModel;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
@@ -73,17 +69,11 @@ public class HistorianServiceHTTPS implements HistorianService {
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.HTTP);
 			if (operation.getOperation().equalsIgnoreCase(this.getDataOperation)) {
-				Ensure.notNull(interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD), "no method for get-data operation");
-				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.ADDRESS), "get-data operation address is empty");
-				Ensure.portRange(interfaceProfile.get(Integer.class, HttpsKey.PORT));
-				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.PATH), "no path for get-data operation");
+				interfaceProfile.verifyForHTTP(true);
 				this.getDataHTTPClient = communicator.client(interfaceProfile);
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.putDataOperation)) {
-				Ensure.notNull(interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD), "no method for put-data operation");
-				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.ADDRESS), "put-data operation address is empty");
-				Ensure.portRange(interfaceProfile.get(Integer.class, HttpsKey.PORT));
-				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.PATH), "no path for put-data operation");
+				interfaceProfile.verifyForHTTP(true);
 				this.putDataHTTPClient = communicator.client(interfaceProfile);
 			}
 		}

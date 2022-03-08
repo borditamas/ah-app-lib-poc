@@ -13,7 +13,6 @@ import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile
 import ai.aitia.arrowhead.application.common.networking.profile.MessageProperties;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.networking.profile.model.PathVariables;
-import ai.aitia.arrowhead.application.common.networking.profile.mqtt.MqttKey;
 import ai.aitia.arrowhead.application.common.networking.profile.mqtt.MqttMsgKey;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.OperationModel;
@@ -71,11 +70,11 @@ public class HistorianServiceMQTT implements HistorianService  {
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.WEBSOCKET);
 			if (operation.getOperation().equalsIgnoreCase(this.getDataOperation)) {
-				Ensure.notEmpty(interfaceProfile.get(String.class, MqttKey.TOPIC_SUBSCRIBE), "subscribeTopic for get-data is empty");
+				interfaceProfile.verifyForMQTT(true, false);
 				this.getDataMQTTClient = communicator.client(interfaceProfile);
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.putDataOperation)) {
-				Ensure.notEmpty(interfaceProfile.get(String.class, MqttKey.TOPIC_PUBLISH), "publishTopic for put-data is empty");
+				interfaceProfile.verifyForMQTT(false, true);
 				this.putDataMQTTClient = communicator.client(interfaceProfile);
 			}
 		}			

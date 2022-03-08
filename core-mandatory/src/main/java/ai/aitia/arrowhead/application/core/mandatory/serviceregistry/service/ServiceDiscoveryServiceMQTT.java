@@ -84,13 +84,11 @@ public class ServiceDiscoveryServiceMQTT implements ServiceDiscoveryService {
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.HTTP);
 			if (operation.getOperation().equalsIgnoreCase(this.registerOperation)) {
-				Ensure.notEmpty(interfaceProfile.get(String.class, MqttKey.TOPIC_PUBLISH), "publishTopic for register is empty");
-				Ensure.notEmpty(interfaceProfile.get(String.class, MqttKey.TOPIC_SUBSCRIBE), "subscribeTopic for register is empty");
+				interfaceProfile.verifyForMQTT(true, true);
 				this.registerMqttClient = communicator.client(interfaceProfile);
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.unregisterOperation)) {
-				Ensure.notEmpty(interfaceProfile.get(String.class, MqttKey.TOPIC_PUBLISH), "publishTopic for unregister is empty");
-				Ensure.notEmpty(interfaceProfile.get(String.class, MqttKey.TOPIC_SUBSCRIBE), "subscribeTopic for unregister is empty");
+				interfaceProfile.verifyForMQTT(true, true);
 				this.unregisterMqttClient = communicator.client(interfaceProfile);
 			}
 		}				

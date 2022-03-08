@@ -87,13 +87,11 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.HTTP);
 			if (operation.getOperation().equalsIgnoreCase(this.registerOperation)) {
-				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for register operation");
-				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for register operation");
+				interfaceProfile.verifyForHTTP(true);
 				this.registerHttpsClient = communicator.client(interfaceProfile);
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.unregisterOperation)) {
-				Ensure.isTrue(interfaceProfile.contains(HttpsKey.PATH), "no path for unregister operation");
-				Ensure.isTrue(interfaceProfile.contains(HttpsKey.METHOD), "no http method for unregister operation");
+				interfaceProfile.verifyForHTTP(true);
 				this.unregisterHttpsClient = communicator.client(interfaceProfile);
 			}
 		}		

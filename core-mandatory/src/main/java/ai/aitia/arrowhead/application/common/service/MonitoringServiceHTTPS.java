@@ -8,8 +8,6 @@ import ai.aitia.arrowhead.application.common.networking.decoder.MediaType;
 import ai.aitia.arrowhead.application.common.networking.decoder.PayloadResolver;
 import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
-import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
-import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.OperationModel;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
@@ -58,13 +56,11 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 		
 		for (final OperationModel operation : service.getOperations()) {
 			Ensure.notNull(operation, "operation is null");
-			Ensure.isTrue(operation.getInterfaceProfiles().containsKey(Protocol.HTTP), "operation have not HTTP profile");
+			Ensure.isTrue(operation.getInterfaceProfiles().containsKey(Protocol.HTTP), "operation have no HTTP profile");
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.HTTP);
 			if (operation.getOperation().equalsIgnoreCase(this.echoOperation)) {
-				Ensure.notEmpty(interfaceProfile.get(String.class, HttpsKey.ADDRESS), "echo operation address is empty");
-				Ensure.portRange(interfaceProfile.get(Integer.class, HttpsKey.PORT));
-				Ensure.notNull(interfaceProfile.get(HttpMethod.class, HttpsKey.METHOD), "no http method for echo operation");
+				interfaceProfile.verifyForHTTP(true);
 				this.echoHttpsClient = communicator.client(interfaceProfile);
 			}
 		}		

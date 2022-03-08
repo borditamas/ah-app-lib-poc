@@ -2,6 +2,10 @@ package ai.aitia.arrowhead.application.common.networking.profile;
 
 import java.util.HashMap;
 
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpMethod;
+import ai.aitia.arrowhead.application.common.networking.profile.http.HttpsKey;
+import ai.aitia.arrowhead.application.common.networking.profile.mqtt.MqttKey;
+import ai.aitia.arrowhead.application.common.networking.profile.websocket.WebsocketKey;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 
 public class InterfaceProfile {
@@ -52,5 +56,37 @@ public class InterfaceProfile {
 		}
 		Ensure.isTrue(castTo.isAssignableFrom(o.getClass()), "Value for key " + key.name() + "cannot cast to" + castTo.getSimpleName());
 		return (T)o;
+	}
+	
+	//-------------------------------------------------------------------------------------------------
+	public void verifyForHTTP(final boolean path) {
+		Ensure.isTrue(this.protocol == Protocol.HTTP, "Interface profile is not for HTTP");
+		Ensure.notEmpty(get(String.class, HttpsKey.ADDRESS), "Address is empty");
+		Ensure.portRange(get(Integer.class, HttpsKey.PORT));
+		Ensure.notNull(get(HttpMethod.class, HttpsKey.METHOD), "No http method defined");
+		if (path) {
+			Ensure.notEmpty(get(String.class, HttpsKey.ADDRESS), "Path is empty");
+		}
+	}
+	
+	//-------------------------------------------------------------------------------------------------
+	public void verifyForWS(final boolean path) {
+		Ensure.isTrue(this.protocol == Protocol.WEBSOCKET, "Interface profile is not for Websocket");
+		Ensure.notEmpty(get(String.class, WebsocketKey.ADDRESS), "Address is empty");
+		Ensure.portRange(get(Integer.class, WebsocketKey.PORT));
+		if (path) {
+			Ensure.notEmpty(get(String.class, WebsocketKey.ADDRESS), "Path is empty");
+		}
+	}
+	
+	//-------------------------------------------------------------------------------------------------
+	public void verifyForMQTT(final boolean subscribe, final boolean publish) {
+		Ensure.isTrue(this.protocol == Protocol.MQTT, "Interface profile is not for MQTT");
+		if (subscribe) {
+			Ensure.notEmpty(get(String.class, MqttKey.TOPIC_SUBSCRIBE), "Have no subscribe topic");
+		}
+		if (publish) {
+			Ensure.notEmpty(get(String.class, MqttKey.TOPIC_PUBLISH), "Have no publish topic");
+		}
 	}
 }
