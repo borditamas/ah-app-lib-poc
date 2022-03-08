@@ -81,8 +81,8 @@ public class MonitoringServiceHTTPS implements MonitoringService {
 	public boolean echo() {
 		try {
 			this.echoHttpsClient.send(null);
-			this.echoHttpsClient.receive(new PayloadResolver(MediaType.EMPTY)); // Later it will contain some data
-			return true;
+			final PayloadResolver resolver = new PayloadResolver(MediaType.EMPTY);
+			return !resolver.isClientError();
 			
 		} catch (final CommunicationException ex) {
 			return false;

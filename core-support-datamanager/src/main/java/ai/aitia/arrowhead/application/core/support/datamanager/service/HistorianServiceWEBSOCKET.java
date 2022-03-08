@@ -13,7 +13,6 @@ import ai.aitia.arrowhead.application.common.networking.profile.InterfaceProfile
 import ai.aitia.arrowhead.application.common.networking.profile.MessageProperties;
 import ai.aitia.arrowhead.application.common.networking.profile.Protocol;
 import ai.aitia.arrowhead.application.common.networking.profile.model.PathVariables;
-import ai.aitia.arrowhead.application.common.networking.profile.websocket.WebsocketKey;
 import ai.aitia.arrowhead.application.common.networking.profile.websocket.WebsocketMsgKey;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.OperationModel;
@@ -72,15 +71,11 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 			
 			final InterfaceProfile interfaceProfile = operation.getInterfaceProfiles().get(Protocol.WEBSOCKET);
 			if (operation.getOperation().equalsIgnoreCase(this.getDataOperation)) {
-				Ensure.notEmpty(interfaceProfile.get(String.class, WebsocketKey.ADDRESS), "get-data operation address is empty");
-				Ensure.portRange(interfaceProfile.get(Integer.class, WebsocketKey.PORT));
-				Ensure.notEmpty(interfaceProfile.get(String.class, WebsocketKey.PATH), "no path for get-data operation");
+				interfaceProfile.verifyForWS(true);
 				this.getDataWSClient = communicator.client(interfaceProfile);
 			}
 			if (operation.getOperation().equalsIgnoreCase(this.putDataOperation)) {
-				Ensure.notEmpty(interfaceProfile.get(String.class, WebsocketKey.ADDRESS), "put-data operation address is empty");
-				Ensure.portRange(interfaceProfile.get(Integer.class, WebsocketKey.PORT));
-				Ensure.notEmpty(interfaceProfile.get(String.class, WebsocketKey.PATH), "no path for put-data operation");
+				interfaceProfile.verifyForWS(true);
 				this.putDataWSClient = communicator.client(interfaceProfile);
 			}
 		}			
@@ -111,6 +106,9 @@ public class HistorianServiceWEBSOCKET implements HistorianService {
 			this.getDataConnected = false;
 		}
 		
+		if (resolver.isClientError()) {
+			throw new CommunicationException(resolver.getClientErrorMsg());
+		}
 		return resolver.getPayload(List.class);
 	}
 	

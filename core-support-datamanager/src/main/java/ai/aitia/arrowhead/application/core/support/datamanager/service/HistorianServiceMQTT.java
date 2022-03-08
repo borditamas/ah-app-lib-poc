@@ -105,6 +105,9 @@ public class HistorianServiceMQTT implements HistorianService  {
 			this.getDataSubscribed = false;
 		}
 
+		if (resolver.isClientError()) {
+			throw new CommunicationException(resolver.getClientErrorMsg());
+		}
 		return resolver.getPayload(List.class);
 	}
 	

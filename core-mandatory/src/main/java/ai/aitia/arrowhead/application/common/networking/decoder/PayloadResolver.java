@@ -3,7 +3,7 @@ package ai.aitia.arrowhead.application.common.networking.decoder;
 import ai.aitia.arrowhead.application.common.networking.decoder.exception.PayloadDecodingException;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 
-public class PayloadResolver {
+public class PayloadResolver { // TODO partial/chunked message feature
 	
 	//=================================================================================================
 	// members
@@ -14,6 +14,8 @@ public class PayloadResolver {
 	private String payloadStr;
 	private byte[] payloadBytes;
 	private Object fullMessage;
+	private boolean clientError = false;
+	private String clientErrorMsg;
 	
 	//=================================================================================================
 	// methods
@@ -23,6 +25,14 @@ public class PayloadResolver {
 		Ensure.notNull(media, "MediaType is null");
 		this.media = media;
 	}
+
+	//-------------------------------------------------------------------------------------------------
+	public boolean isClientError() { return clientError; }
+	public String getClientErrorMsg() { return clientErrorMsg; }
+
+	//-------------------------------------------------------------------------------------------------
+	public void setClientError(boolean clientError) { this.clientError = clientError; }
+	public void setClientErrorMsg(String clientErrorMsg) { this.clientErrorMsg = clientErrorMsg; }
 
 	//-------------------------------------------------------------------------------------------------
 	public <P> P getPayload(final Class<P> type) throws PayloadDecodingException {

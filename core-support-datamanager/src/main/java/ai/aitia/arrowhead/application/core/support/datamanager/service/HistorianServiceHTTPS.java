@@ -100,6 +100,9 @@ public class HistorianServiceHTTPS implements HistorianService {
 			this.getDataHTTPClient.terminate(); //TODO should be called before or after send?
 		}
 		
+		if (resolver.isClientError()) {
+			throw new CommunicationException(resolver.getClientErrorMsg());
+		}
 		return resolver.getPayload(List.class);
 	}
 

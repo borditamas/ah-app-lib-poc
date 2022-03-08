@@ -13,6 +13,6 @@ public interface ServiceDiscoveryService extends ArrowheadService {
 	public static final String NAME = "service-discovery";
 
 	ServiceModel register(final ServiceModel service) throws CommunicationException, PayloadDecodingException;
-	boolean unregister(final ServiceModel service) throws CommunicationException;
+	boolean unregister(final ServiceModel service) throws CommunicationException, PayloadDecodingException;
 	List<ServiceModel> query(final ServiceQueryModel from) throws CommunicationException, PayloadDecodingException;
 }

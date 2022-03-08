@@ -120,19 +120,28 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		this.registerHttpsClient.send(new RegisterServiceRequestJSON(service));
 		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.registerHttpsClient.receive(resolver);
+		
+		if (resolver.isClientError()) {
+			throw new CommunicationException(resolver.getClientErrorMsg());
+		}		
 		return resolver.getPayload(RegisterServiceResponseJSON.class).convertToServiceModel();
 	}
 
 	//-------------------------------------------------------------------------------------------------
 	@Override
-	public boolean unregister(final ServiceModel service) throws CommunicationException {
+	public boolean unregister(final ServiceModel service) throws CommunicationException, PayloadDecodingException {
 		final QueryParams queryParams = new QueryParams();
 		queryParams.add("system_name", service.getSystem().getName());
 		queryParams.add("service_name", service.getName());
 		final MessageProperties msgProps = new MessageProperties();
 		msgProps.add(HttpsMsgKey.QUERY_PARAMETERS, queryParams);
-		this.unregisterHttpsClient.send(msgProps, null);		
-		this.unregisterHttpsClient.receive(new PayloadResolver(MediaType.EMPTY));
+		this.unregisterHttpsClient.send(msgProps, null);
+		final PayloadResolver resolver = new PayloadResolver(MediaType.EMPTY);
+		this.unregisterHttpsClient.receive(resolver);
+		
+		if (resolver.isClientError()) {
+			throw new CommunicationException(resolver.getClientErrorMsg());
+		}
 		return true;
 	}
 
@@ -142,6 +151,10 @@ public class ServiceDiscoveryServiceHTTPS implements ServiceDiscoveryService {
 		this.queryHttpsClient.send(new ServiceQueryRequestJSON(form));
 		final PayloadResolver resolver = new PayloadResolver(MediaType.JSON);
 		this.queryHttpsClient.receive(resolver);
+		
+		if (resolver.isClientError()) {
+			throw new CommunicationException(resolver.getClientErrorMsg());
+		}
 		return resolver.getPayload(ServiceQueryResponseJSON.class).convertToServiceModelList();
 	}
 }
