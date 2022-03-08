@@ -1,5 +1,7 @@
 package ai.aitia.arrowhead.application.common.networking.decoder;
 
+import java.nio.ByteBuffer;
+
 import ai.aitia.arrowhead.application.common.networking.decoder.exception.PayloadDecodingException;
 import ai.aitia.arrowhead.application.common.verification.Ensure;
 
@@ -14,6 +16,7 @@ public class PayloadResolver { // TODO partial/chunked message feature
 	private String payloadStr;
 	private byte[] payloadBytes;
 	private Object fullMessage;
+	private boolean partial = false;
 	private boolean clientError = false;
 	private String clientErrorMsg;
 	
@@ -27,15 +30,21 @@ public class PayloadResolver { // TODO partial/chunked message feature
 	}
 
 	//-------------------------------------------------------------------------------------------------
+	public boolean isPartial() { return partial; }
 	public boolean isClientError() { return clientError; }
 	public String getClientErrorMsg() { return clientErrorMsg; }
 
 	//-------------------------------------------------------------------------------------------------
-	public void setClientError(boolean clientError) { this.clientError = clientError; }
-	public void setClientErrorMsg(String clientErrorMsg) { this.clientErrorMsg = clientErrorMsg; }
+	public void setPartial(final boolean partial) { this.partial = partial; }
+	public void setClientError(final boolean clientError) { this.clientError = clientError; }
+	public void setClientErrorMsg(final String clientErrorMsg) { this.clientErrorMsg = clientErrorMsg; }
 
 	//-------------------------------------------------------------------------------------------------
 	public <P> P getPayload(final Class<P> type) throws PayloadDecodingException {
+		if (this.partial) {
+			throw new PayloadDecodingException("Payload is partial yet");
+		}
+		
 		if (this.media == MediaType.EMPTY) {
 			return null;
 		}
@@ -63,27 +72,30 @@ public class PayloadResolver { // TODO partial/chunked message feature
 	
 	//-------------------------------------------------------------------------------------------------
 	public void add(final PayloadDecoder decoder, final String data, final Object fullMessage) {
-		// TODO throw ex when already has value --> final!
 		Ensure.notNull(decoder, "PayloadDecoder is null");
 		Ensure.notNull(fullMessage, "fullMessage is null");
+		
 		this.decoder = decoder;
-		this.payloadStr = data;
 		this.fullMessage = fullMessage;
+		this.payloadStr = this.payloadStr == null || this.payloadStr.isBlank() ? data : this.payloadStr + data;
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	public void add(final PayloadDecoder decoder, final byte[] data, final Object fullMessage) {
-		// TODO throw ex when already has value --> final!
 		Ensure.notNull(decoder, "PayloadDecoder is null");
 		Ensure.notNull(fullMessage, "fullMessage is null");		
+		
 		this.decoder = decoder;
-		this.payloadBytes = data;
 		this.fullMessage = fullMessage;
+		if (this.payloadBytes == null || this.payloadBytes.length == 0) {
+			this.payloadBytes = data;			
+		} else {
+			this.payloadBytes = ByteBuffer.allocate(this.payloadBytes.length + data.length).put(this.payloadBytes).put(data).array();
+		}		
 	}
 	
 	//-------------------------------------------------------------------------------------------------
 	public void add(final Object fullMessage) {
-		// TODO throw ex when already has value --> final!
 		Ensure.notNull(fullMessage, "fullMessage is null");
 		this.fullMessage = fullMessage;
 	}
