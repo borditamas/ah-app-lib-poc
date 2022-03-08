@@ -19,6 +19,7 @@ import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.mod
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceModel;
 import ai.aitia.arrowhead.application.core.mandatory.serviceregistry.service.model.ServiceQueryModel;
 import ai.aitia.arrowhead.application.core.support.datamanager.service.model.SenML;
+import ai.aitia.arrowhead.application.core.support.datamanager.service.model.dto.HistorianRequestJSON;
 
 public class HistorianServiceMQTT implements HistorianService  {
 
@@ -116,8 +117,8 @@ public class HistorianServiceMQTT implements HistorianService  {
 	@Override
 	public void putMeasurements(final String systemName, final String serviceName, final List<SenML> measurements, final boolean terminate) throws CommunicationException { // TODO return an object where all info is conatined (decoding error flag, etc...)
 		final MessageProperties props = new MessageProperties();
-		props.add(MqttMsgKey.PATH_VARIABLES_PUBLISH, new PathVariables(List.of(systemName, serviceName))); // TODO it should be a general topic for sending data 
-		this.putDataMQTTClient.send(props, measurements);
+		final HistorianRequestJSON message = new HistorianRequestJSON(systemName, serviceName, measurements);
+		this.putDataMQTTClient.send(props, message);
 		// 'terminate' is intentionally ignored
 	}
 }

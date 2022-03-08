@@ -11,6 +11,6 @@ public interface HistorianService extends ArrowheadService {
 	
 	public static final String NAME = "historian";
 
-	public SenML getMeasurements(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException, PayloadDecodingException; //TODO change to proper output
-	public void putMeasurements(final String systemName, final String serviceName, final List<SenML> measurements, final boolean terminate) throws CommunicationException; //TODO change to proper input
+	public SenML getMeasurements(final String systemName, final String serviceName, final boolean terminate) throws CommunicationException, PayloadDecodingException;
+	public void putMeasurements(final String systemName, final String serviceName, final List<SenML> measurements, final boolean terminate) throws CommunicationException;
 }
